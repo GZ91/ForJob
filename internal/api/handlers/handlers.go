@@ -7,7 +7,7 @@ import (
 )
 
 type Service interface {
-	RevertSearchStructures(id string) ([]byte, error)
+	RevertSearchStructures(id string) ([][]byte, error)
 }
 
 type Handlers struct {
@@ -27,10 +27,12 @@ func (h Handlers) GetItems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Add("Content-Type", "application/json")
-	_, err = w.Write(data)
-	if err != nil {
-		logger.Log.Error("Ошибка при записи сообщения")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+	for _, val := range data {
+		_, err = w.Write(val)
+		if err != nil {
+			logger.Log.Error("Ошибка при записи сообщения")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 	}
+
 }

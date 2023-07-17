@@ -21,7 +21,7 @@ func New(storage Storage) (*Service, error) {
 	}, nil
 }
 
-func (s Service) RevertSearchStructures(id string) ([]byte, error) {
+func (s Service) RevertSearchStructures(id string) ([][]byte, error) {
 
 	data, err := s.NodeStorage.FindLines(id)
 	if err != nil {
@@ -34,11 +34,18 @@ func (s Service) RevertSearchStructures(id string) ([]byte, error) {
 	}
 
 	columns := s.NodeStorage.GetColumn()
-
+	var dataReturn [][]byte
 	for line := 0; line < countData; line++ {
 		for column := 0; column < len(columns); column++ {
 			returnMap[line][columns[column]] = data[line][column]
 		}
+		data, err := json.Marshal(returnMap)
+		if err != nil {
+			logger.Log.Error("при попытке конвертирования произошла ошибка", zap.Error(err))
+			return nil, err
+		}
+		dataReturn = append(dataReturn, data)
 	}
-	return json.Marshal(returnMap)
+
+	return dataReturn, nil
 }
