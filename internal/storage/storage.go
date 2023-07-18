@@ -20,6 +20,7 @@ func New(path string) (*StorageCSV, error) {
 		logger.Log.Error("При создании узла хранения", zap.Error(err))
 		return nil, err
 	}
+	defer file.Close() // в первой итерации забыл закрыть файл - поторопился
 	csvStorage, err := csv.NewReader(file).ReadAll()
 	if err != nil {
 		logger.Log.Error("При чтении csv файла", zap.Error(err))
@@ -40,7 +41,7 @@ func (s StorageCSV) GetColumn() []string {
 func (s StorageCSV) getData() [][]string {
 	var tempR [][]string
 	temp2 := s.csv[1:]
-	tempR = append(tempR, temp2...)
+	tempR = append(tempR, temp2...) // передаю копированием, т.к. get подразумевает не отдавать оригинал чтобы его не поменяли.
 	return tempR
 }
 
@@ -66,11 +67,14 @@ func (s StorageCSV) FindLines(id string) ([][]string, error) {
 		go findLinesOn(ch, id, data[CountLineForCPU*i : CountLineForCPU*i+CountLineForCPU][:], &wg)
 	}
 	wg.Wait()
-	return <-exch, nil
+	dataReturn := <-exch
+	close(exch)
+	close(ch)
+	return dataReturn, nil
 
 }
 
-func findLinesOn(ch chan []string, id string, data [][]string, wg *sync.WaitGroup) {
+func findLinesOn(ch chan<- []string, id string, data [][]string, wg *sync.WaitGroup) {
 	for _, val := range data {
 		if val[1] == id {
 			ch <- val

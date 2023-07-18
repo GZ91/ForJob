@@ -19,7 +19,7 @@ func New(service Service) (*Handlers, error) {
 }
 
 func (h Handlers) GetItems(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+	id := chi.URLParam(r, "id") //как принимать параметры это уже вкусовщина на мой взгляд
 	data, err := h.NodeService.RevertSearchStructures(id)
 	if err != nil {
 		logger.Log.Error("Ошибка при получении данных по отбору")
@@ -32,6 +32,7 @@ func (h Handlers) GetItems(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			logger.Log.Error("Ошибка при записи сообщения")
 			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	}
 
