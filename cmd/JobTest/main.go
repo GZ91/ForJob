@@ -18,6 +18,6 @@ func main() {
 	}
 	err := server.Run(path)
 	if err != nil {
-		panic(err)
+		panic(err) // "никогда не паникуйте", но я думаю что паникавать в функции main имеет смысл
 	}
 }
