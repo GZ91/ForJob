@@ -15,6 +15,7 @@ func main() {
 	if path == "" {
 		logger.Log.Error("Не указано имя файла.")
 		fmt.Println("Укажите пожалуйста имя файла CSV")
+		return
 	}
 	err := server.Run(path)
 	if err != nil {
