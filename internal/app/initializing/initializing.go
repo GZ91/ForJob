@@ -1,18 +1,19 @@
 package initializing
 
 import (
+	"strings"
+
 	"github.com/GZ91/linkreduct/internal/app/config"
 	"github.com/GZ91/linkreduct/internal/app/initializing/envs"
 	"github.com/GZ91/linkreduct/internal/app/initializing/flags"
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"go.uber.org/zap"
-	"strings"
 )
 
 func Configuration() *config.Config {
 	addressServer, addressServerForURL, logLvl, pathFileStorage, connectionStringDB := ReadParams()
 	logger.Initializing(logLvl)
-	conf := config.New(false, addressServer, addressServerForURL, 10, 5, pathFileStorage)
+	conf := config.New(false, addressServer, addressServerForURL, 100, 4, pathFileStorage)
 	conf.ConfigureDBPostgresql(connectionStringDB)
 	return conf
 }
