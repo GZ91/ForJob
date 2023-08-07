@@ -25,9 +25,9 @@ building-test:
 deploying-prod:
   stage: deploy
   script:
-      - chmod +x ./scripts/node-prod-starter.sh && ./scripts/node-prod-starter.sh
+      - chmod +x ./scripts/reductor-prod-starter.sh && ./scripts/reductor-prod-starter.sh
   allow_failure: true
-  when: manual
+  when: always
   only:
     - main
     - /release-.*/
@@ -35,6 +35,6 @@ deploying-prod:
 deploying-test:
   stage: deploy
   script:
-    - chmod +x ./scripts/node-tst-starter.sh && ./scripts/node-tst-starter.sh
+    - chmod +x ./scripts/reductor-tst-starter.sh && ./scripts/reductor-tst-starter.sh
   allow_failure: true
   when: manual
