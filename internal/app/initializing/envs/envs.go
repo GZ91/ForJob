@@ -28,5 +28,5 @@ func ReadEnv() (*EnvVars, error) {
 }
 
 func (r *EnvVars) GetAddressDSN() string {
-	return "postgres://" + r.CSDBLogin + ":" + r.CSDBPassword + "@" + r.CSDBAddress + "/" + r.CSDBBaseName + "sslmode=" + r.CSDBSslmode
+	return "postgres://" + r.CSDBLogin + ":" + r.CSDBPassword + "@" + r.CSDBAddress + "/" + r.CSDBBaseName + "?sslmode=" + r.CSDBSslmode
 }
