@@ -11,19 +11,19 @@ type Config struct {
 	addressServerURL  string
 	maxIterLen        int
 	startLenShortLink int
-	fileStorage       string
 	configDB          *postgresqlconfig.ConfigDB
 	mutex             sync.Mutex
+	secretKey         string
 }
 
-func New(debug bool, addressServer, addressServerURL string, maxIterRuneGen int, startLenShortLink int, fileStorage string) *Config {
+func New(debug bool, addressServer, addressServerURL string, maxIterRuneGen int, startLenShortLink int, SecretKey string) *Config {
 	return &Config{
 		debug:             debug,
 		addressServer:     addressServer,
 		maxIterLen:        maxIterRuneGen,
 		addressServerURL:  addressServerURL,
 		startLenShortLink: startLenShortLink,
-		fileStorage:       fileStorage,
+		secretKey:         SecretKey,
 	}
 }
 
@@ -65,8 +65,6 @@ func (r *Config) GetStartLenShortLink() int {
 	return r.startLenShortLink
 }
 
-func (r *Config) GetNameFileStorage() string {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
-	return r.fileStorage
+func (r *Config) GetSecretKey() string {
+	return r.secretKey
 }

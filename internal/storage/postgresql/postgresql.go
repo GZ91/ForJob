@@ -69,9 +69,8 @@ func (d *DB) createTable(ctx context.Context) error {
 	_, err = con.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS short_origin_reference 
 (
 	id serial PRIMARY KEY,
-	uuid VARCHAR(45)  NOT NULL,
+	token VARCHAR(45)  NOT NULL,
 	ShortURL VARCHAR(250) NOT NULL,
-    userID VARCHAR(45)  NOT NULL,
     deletedFlag boolean DEFAULT FALSE, 
 	OriginalURL TEXT
 );`)
@@ -89,11 +88,11 @@ func (d *DB) Ping(ctx context.Context) error {
 }
 
 func (d *DB) AddURL(ctx context.Context, URL string) (string, error) {
-	var UserID string
-	var userIDCTX models.CtxString = "userID"
-	UserIDVal := ctx.Value(userIDCTX)
+	var token string
+	var tokenIDCTX models.CtxString = "token"
+	UserIDVal := ctx.Value(tokenIDCTX)
 	if UserIDVal != nil {
-		UserID = UserIDVal.(string)
+		token = UserIDVal.(string)
 	}
 
 	con, err := d.db.Conn(ctx)
@@ -125,8 +124,8 @@ func (d *DB) AddURL(ctx context.Context, URL string) (string, error) {
 		}
 	}
 
-	_, err = con.ExecContext(ctx, "INSERT INTO short_origin_reference(uuid, shorturl, originalurl, userID) VALUES ($1, $2, $3, $4);",
-		uuid.New().String(), shorturl, URL, UserID)
+	_, err = con.ExecContext(ctx, "INSERT INTO short_origin_reference(token, shorturl, originalurl) VALUES ($1, $2, $3, $4);",
+		uuid.New().String(), shorturl, URL, token)
 	if err != nil {
 		logger.Log.Error("error when adding a record to the database", zap.Error(err))
 	}
@@ -270,7 +269,7 @@ func (d *DB) AddBatchLink(ctx context.Context, batchLinks []models.IncomingBatch
 	return
 }
 
-func (d *DB) GetLinksUser(ctx context.Context, userID string) ([]models.ReturnedStructURL, error) {
+func (d *DB) GetLinksToken(ctx context.Context, userID string) ([]models.ReturnedStructURL, error) {
 	con, err := d.db.Conn(ctx)
 	if err != nil {
 		logger.Log.Error("failed to connect to the database", zap.Error(err))

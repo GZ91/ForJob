@@ -1,16 +1,20 @@
-FROM golang:1.16-alpine
+FROM golang:1.20
 
+LABEL authors="GeorgiyZ"
 WORKDIR /app
 
 COPY go.mod ./
 COPY go.sum ./
+
 RUN go mod download
 
-COPY internal/* ./
-COPY cmd/shortener/main.go ./
+COPY . .
 
-RUN go build -o /go-dockerapp
+RUN go get -t ./...
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o ./GoDockerapp ./cmd/shortener/main.go
 
 EXPOSE 8080
 
-CMD [ "/go-dockerapp" ]
+ENTRYPOINT ["./GoDockerapp"]
+#CMD ["./go-dockerapp"]

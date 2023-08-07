@@ -5,6 +5,8 @@ import (
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/errorsapp"
 	"github.com/GZ91/linkreduct/internal/models"
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"regexp"
 )
@@ -18,7 +20,7 @@ type Storeger interface {
 	Ping(context.Context) error
 	AddBatchLink(context.Context, []models.IncomingBatchURL) ([]models.ReleasedBatchURL, error)
 	FindLongURL(context.Context, string) (string, bool, error)
-	GetLinksUser(context.Context, string) ([]models.ReturnedStructURL, error)
+	GetLinksToken(context.Context, string) ([]models.ReturnedStructURL, error)
 	InitializingRemovalChannel(context.Context, chan []models.StructDelURLs) error
 }
 
@@ -27,6 +29,7 @@ type Storeger interface {
 //go:generate mockery --name ConfigerService --with-expecter
 type ConfigerService interface {
 	GetAddressServerURL() string
+	GetSecretKey() string
 }
 
 func New(ctx context.Context, db Storeger, conf ConfigerService, ChsURLForDel chan []models.StructDelURLs) *NodeService {
@@ -110,9 +113,9 @@ func (r *NodeService) Ping(ctx context.Context) error {
 	return r.db.Ping(ctx)
 }
 
-func (r *NodeService) GetURLsUser(ctx context.Context, userID string) ([]models.ReturnedStructURL, error) {
+func (r *NodeService) GetURLsToken(ctx context.Context, token string) ([]models.ReturnedStructURL, error) {
 	addressServer := r.conf.GetAddressServerURL()
-	returnedStructURL, err := r.db.GetLinksUser(ctx, userID)
+	returnedStructURL, err := r.db.GetLinksToken(ctx, token)
 	if err != nil {
 		return nil, err
 	}
@@ -136,4 +139,22 @@ func (r *NodeService) DeletedLinks(listURLs []string, userID string) {
 func (r *NodeService) Close() error {
 	close(r.ChsURLForDel)
 	return nil
+}
+
+func (r *NodeService) GetDataToken() (string, string, error) {
+	return getDataForToken(r.conf.GetSecretKey())
+}
+
+func getDataForToken(secretKey string) (string, string, error) {
+	Token := uuid.New().String()
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, models.Claims{
+		Token: Token,
+	})
+
+	DataString, err := token.SignedString([]byte(secretKey))
+	if err != nil {
+		return "", "", err
+	}
+
+	return DataString, Token, nil
 }

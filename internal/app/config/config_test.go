@@ -62,35 +62,6 @@ func TestConfig_GetStartLenShortLink(t *testing.T) {
 	}
 }
 
-func TestConfig_GetNameFileStorage(t *testing.T) {
-	type fields struct {
-		fileStorage string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   string
-	}{
-		{
-			name: "Success",
-			fields: fields{
-				fileStorage: "pathfile",
-			},
-			want: "pathfile",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Config{
-				fileStorage: tt.fields.fileStorage,
-			}
-			if got := r.GetNameFileStorage(); got != tt.want {
-				t.Errorf("GetNameFileStorage() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestConfig_GetMaxIterLen(t *testing.T) {
 	type fields struct {
 		maxIterLen int

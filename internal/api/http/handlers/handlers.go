@@ -18,7 +18,7 @@ import (
 type handlerserService interface {
 	GetSmallLink(context.Context, string) (string, error)
 	GetURL(context.Context, string) (string, bool, error)
-	GetURLsUser(context.Context, string) ([]models.ReturnedStructURL, error)
+	GetURLsToken(context.Context, string) ([]models.ReturnedStructURL, error)
 	Ping(ctx context.Context) error
 	AddBatchLink(context.Context, []models.IncomingBatchURL) ([]models.ReleasedBatchURL, error)
 	DeletedLinks([]string, string)
@@ -202,19 +202,19 @@ func (h *handlers) AddBatchLinks(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *handlers) GetURLsUser(w http.ResponseWriter, r *http.Request) {
-	var UserID string
-	var userIDCTX models.CtxString = "userID"
-	UserIDVal := r.Context().Value(userIDCTX)
-	if UserIDVal != nil {
-		UserID = UserIDVal.(string)
+func (h *handlers) GetURLsToken(w http.ResponseWriter, r *http.Request) {
+	var token string
+	var tokenIDCTX models.CtxString = "token"
+	TokenIDVal := r.Context().Value(tokenIDCTX)
+	if TokenIDVal != nil {
+		token = TokenIDVal.(string)
 	}
-	if UserID == "" {
+	if token == "" {
 		logger.Log.Info("trying to execute a method to retrieve a URL by a user by an unauthorized user")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	returnedURLs, err := h.nodeService.GetURLsUser(r.Context(), UserID)
+	returnedURLs, err := h.nodeService.GetURLsToken(r.Context(), token)
 	if err != nil {
 		logger.Log.Error("when getting URLs on the user side", zap.Error(err))
 		w.WriteHeader(http.StatusInternalServerError)
