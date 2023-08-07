@@ -1,14 +1,12 @@
-FROM golang:1.20
+FROM golang:1.20-alpine
 
 LABEL authors="GeorgiyZ"
 WORKDIR /app
 
-COPY go.mod ./
-COPY go.sum ./
-
-RUN go mod download
-
+# COPY go.mod ./
+# COPY go.sum ./
 COPY . .
+RUN go mod download
 
 RUN go get -t ./...
 
