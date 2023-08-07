@@ -71,7 +71,6 @@ func (d *DB) createTable(ctx context.Context) error {
 	id serial PRIMARY KEY,
 	token VARCHAR(45)  NOT NULL,
 	ShortURL VARCHAR(250) NOT NULL,
-    deletedFlag boolean DEFAULT FALSE, 
 	OriginalURL TEXT
 );`)
 	return err
@@ -130,31 +129,6 @@ func (d *DB) AddURL(ctx context.Context, URL string) (string, error) {
 		logger.Log.Error("error when adding a record to the database", zap.Error(err))
 	}
 	return shorturl, nil
-}
-
-func (d *DB) GetURL(ctx context.Context, shortURL string) (string, bool, error) {
-	con, err := d.db.Conn(ctx)
-	if err != nil {
-		logger.Log.Error("failed to connect to the database", zap.Error(err))
-		return "", false, err
-	}
-	defer con.Close()
-	row := con.QueryRowContext(ctx, `SELECT originalurl, deletedFlag 
-	FROM short_origin_reference WHERE shorturl = $1 limit 1`, shortURL)
-	var originurl string
-	var deletedFlag bool
-	err = row.Scan(&originurl, &deletedFlag)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		logger.Log.Error("when scanning the request for the original link", zap.Error(err))
-		return "", false, err
-	}
-	if deletedFlag {
-		return "", false, errorsapp.ErrLineURLDeleted
-	}
-	if originurl != "" {
-		return originurl, true, nil
-	}
-	return "", false, nil
 }
 
 func (d *DB) Close() error {

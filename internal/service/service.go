@@ -85,23 +85,6 @@ func (r *NodeService) GetSmallLink(ctx context.Context, longLink string) (string
 	return r.conf.GetAddressServerURL() + id, nil
 }
 
-func (r *NodeService) AddBatchLink(ctx context.Context, batchLink []models.IncomingBatchURL) (releasedBatchURL []models.ReleasedBatchURL, errs error) {
-
-	for _, data := range batchLink {
-		link := data.OriginalURL
-
-		if !r.URLFilter.MatchString(link) {
-			return nil, errorsapp.ErrInvalidLinkReceived
-		}
-	}
-
-	releasedBatchURL, errs = r.db.AddBatchLink(ctx, batchLink)
-	for index, val := range releasedBatchURL {
-		releasedBatchURL[index].ShortURL = r.conf.GetAddressServerURL() + val.ShortURL
-	}
-	return
-}
-
 func (r *NodeService) getFormatLongLink(longLink string) (string, error) {
 	if !r.URLFormat.MatchString(longLink) {
 		longLink = "http://" + longLink
