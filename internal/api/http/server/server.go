@@ -27,7 +27,7 @@ type NodeStorager interface {
 func Start(ctx context.Context, conf *config.Config) (er error) {
 	var NodeStorage NodeStorager
 	GeneratorRunes := genrunes.New()
-	if !conf.GetConfDB().Empty() {
+	if conf.GetConfDB().Empty() {
 		return errorsapp.ErrNotConfiguration
 	}
 	NodeStorage, err := postgresql.New(ctx, conf, GeneratorRunes)
