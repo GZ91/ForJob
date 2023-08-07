@@ -12,7 +12,7 @@ type Genrun struct {
 
 func New() *Genrun {
 	return &Genrun{
-		letterRunes: []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789"),
+		letterRunes: []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"),
 		rander:      rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 }

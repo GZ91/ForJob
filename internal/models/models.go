@@ -1,5 +1,7 @@
 package models
 
+import "github.com/golang-jwt/jwt/v4"
+
 type StructURL struct {
 	ID          string `json:"uuid" db:"uuid"`
 	ShortURL    string `json:"short_url" db:"ShortURL"`
@@ -36,4 +38,9 @@ type CtxString string
 type StructDelURLs struct {
 	URL    string
 	UserID string
+}
+
+type Claims struct {
+	jwt.RegisteredClaims
+	Token string
 }

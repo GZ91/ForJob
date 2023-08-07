@@ -2,19 +2,15 @@ package server
 
 import (
 	"context"
+	"github.com/GZ91/linkreduct/internal/api/http/NodeMiddleware"
 	"github.com/GZ91/linkreduct/internal/api/http/handlers"
-	authenticationmiddleware "github.com/GZ91/linkreduct/internal/api/http/middleware/authentication"
-	"github.com/GZ91/linkreduct/internal/api/http/middleware/compress"
-	"github.com/GZ91/linkreduct/internal/api/http/middleware/logger"
-	"github.com/GZ91/linkreduct/internal/api/http/middleware/size"
 	"github.com/GZ91/linkreduct/internal/app/config"
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/app/signalreception"
+	"github.com/GZ91/linkreduct/internal/errorsapp"
 	"github.com/GZ91/linkreduct/internal/models"
 	"github.com/GZ91/linkreduct/internal/service"
 	"github.com/GZ91/linkreduct/internal/service/genrunes"
-	"github.com/GZ91/linkreduct/internal/storage/infile"
-	"github.com/GZ91/linkreduct/internal/storage/inmemory"
 	"github.com/GZ91/linkreduct/internal/storage/postgresql"
 	"github.com/go-chi/chi/v5"
 	"github.com/pkg/errors"
@@ -32,29 +28,28 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 	var NodeStorage NodeStorager
 	GeneratorRunes := genrunes.New()
 	if !conf.GetConfDB().Empty() {
-		var err error
-		NodeStorage, err = postgresql.New(ctx, conf, GeneratorRunes)
-		if err != nil {
-			return err
-		}
-	} else if conf.GetNameFileStorage() != "" {
-		NodeStorage = infile.New(ctx, conf, GeneratorRunes)
-	} else {
-		NodeStorage = inmemory.New(ctx, conf, GeneratorRunes)
+		return errorsapp.ErrNotConfiguration
+	}
+	NodeStorage, err := postgresql.New(ctx, conf, GeneratorRunes)
+	if err != nil {
+		return err
 	}
 
 	NodeService := service.New(ctx, NodeStorage, conf, make(chan []models.StructDelURLs))
 	handls := handlers.New(NodeService)
 
 	router := chi.NewRouter()
-	router.Use(authenticationmiddleware.Authentication)
-	router.Use(sizemiddleware.CalculateSize)
-	router.Use(loggermiddleware.WithLogging)
-	router.Use(compressmiddleware.Compress)
+
+	NodeUse := NodeMiddleware.New(conf)
+
+	router.Use(NodeUse.Authentication)
+	router.Use(NodeUse.WithLogging)
+	router.Use(NodeUse.Compress)
+	router.Use(NodeUse.CalculateSize)
 
 	router.Get("/ping", handls.PingDataBase)
 	router.Get("/{id}", handls.GetLongURL)
-	router.Get("/api/user/urls", handls.GetURLsUser)
+	router.Get("/api/token/urls", handls.GetURLsToken)
 	router.Post("/", handls.AddLongLink)
 	router.Post("/api/shorten/batch", handls.AddBatchLinks)
 	router.Post("/api/shorten", handls.AddLongLinkJSON)

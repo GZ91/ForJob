@@ -8,8 +8,8 @@ type EnvVars struct {
 	AddressServer       string `env:"SERVER_ADDRESS"`
 	AddressServerForURL string `env:"BASE_URL"`
 	LvlLogs             string `env:"LOG_LEVEL"`
-	PathFileStorage     string `env:"FILE_STORAGE_PATH"`
 	ConnectionStringDB  string `env:"DATABASE_DSN"`
+	SecretKey           string `env:"Secret_Key"`
 }
 
 func ReadEnv() (*EnvVars, error) {

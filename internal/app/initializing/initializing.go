@@ -1,19 +1,18 @@
 package initializing
 
 import (
-	"strings"
-
 	"github.com/GZ91/linkreduct/internal/app/config"
 	"github.com/GZ91/linkreduct/internal/app/initializing/envs"
 	"github.com/GZ91/linkreduct/internal/app/initializing/flags"
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"go.uber.org/zap"
+	"strings"
 )
 
 func Configuration() *config.Config {
-	addressServer, addressServerForURL, logLvl, pathFileStorage, connectionStringDB := ReadParams()
+	addressServer, addressServerForURL, logLvl, connectionStringDB, SecretKey := ReadParams()
 	logger.Initializing(logLvl)
-	conf := config.New(false, addressServer, addressServerForURL, 100, 4, pathFileStorage)
+	conf := config.New(false, addressServer, addressServerForURL, 10, 5, SecretKey)
 	conf.ConfigureDBPostgresql(connectionStringDB)
 	return conf
 }
@@ -25,16 +24,16 @@ func ReadParams() (string, string, string, string, string) {
 		logger.Log.Error("error when reading environment variables", zap.String("error", err.Error()))
 	}
 
-	var addressServer, addressServerForURL, logLvl, pathFileStorage, connectionStringDB string
+	var addressServer, addressServerForURL, logLvl, connectionStringDB, SecretKey string
 
 	if envVars == nil {
-		addressServer, addressServerForURL, logLvl, pathFileStorage, connectionStringDB = flags.ReadFlags()
+		addressServer, addressServerForURL, logLvl, connectionStringDB, SecretKey = flags.ReadFlags()
 	} else {
-		addressServer, addressServerForURL, logLvl, pathFileStorage, connectionStringDB =
-			envVars.AddressServer, envVars.AddressServerForURL, envVars.LvlLogs, envVars.PathFileStorage, envVars.ConnectionStringDB
+		addressServer, addressServerForURL, logLvl, connectionStringDB =
+			envVars.AddressServer, envVars.AddressServerForURL, envVars.LvlLogs, envVars.ConnectionStringDB
 
-		if addressServer == "" || addressServerForURL == "" || logLvl == "" || pathFileStorage == "" || connectionStringDB == "" {
-			addressServerFlag, addressServerForURLFlag, logLvlFlag, pathFileStorageFlag, connectionStringDBFlag := flags.ReadFlags()
+		if addressServer == "" || addressServerForURL == "" || logLvl == "" || connectionStringDB == "" {
+			addressServerFlag, addressServerForURLFlag, logLvlFlag, connectionStringDBFlag, SecretKeyFlag := flags.ReadFlags()
 			if addressServer == "" {
 				addressServer = addressServerFlag
 			}
@@ -44,17 +43,17 @@ func ReadParams() (string, string, string, string, string) {
 			if logLvl == "" {
 				logLvl = logLvlFlag
 			}
-			if pathFileStorage == "" {
-				pathFileStorage = pathFileStorageFlag
-			}
 			if connectionStringDB == "" {
 				connectionStringDB = connectionStringDBFlag
+			}
+			if SecretKey == "" {
+				SecretKey = SecretKeyFlag
 			}
 		}
 	}
 
 	addressServerForURL = CheckChangeBaseURL(addressServer, addressServerForURL)
-	return addressServer, addressServerForURL, logLvl, pathFileStorage, connectionStringDB
+	return addressServer, addressServerForURL, logLvl, connectionStringDB, SecretKey
 }
 
 func CheckChangeBaseURL(addressServer, addressServerURL string) string {
