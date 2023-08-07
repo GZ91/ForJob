@@ -8,7 +8,11 @@ import (
 
 func main() {
 	ctx := context.Background()
-	appliction := app.New(initializing.Configuration())
+	conf, err := initializing.Configuration()
+	if err != nil {
+		panic(err)
+	}
+	appliction := app.New(conf)
 	appliction.Run(ctx)
 
 }
