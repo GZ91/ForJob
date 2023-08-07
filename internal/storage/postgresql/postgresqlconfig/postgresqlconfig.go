@@ -5,6 +5,7 @@ type ConfigDB struct {
 }
 
 func New(StringServer string) *ConfigDB {
+
 	return &ConfigDB{StringServer: StringServer}
 }
 
