@@ -11,27 +11,6 @@ import (
 	"regexp"
 )
 
-// Storeger
-//
-//go:generate mockery --name Storeger --with-expecter
-type Storeger interface {
-	AddURL(context.Context, string) (string, error)
-	GetURL(context.Context, string) (string, bool, error)
-	Ping(context.Context) error
-	AddBatchLink(context.Context, []models.IncomingBatchURL) ([]models.ReleasedBatchURL, error)
-	FindLongURL(context.Context, string) (string, bool, error)
-	GetLinksToken(context.Context, string) ([]models.ReturnedStructURL, error)
-	InitializingRemovalChannel(context.Context, chan []models.StructDelURLs) error
-}
-
-// Storeger
-//
-//go:generate mockery --name ConfigerService --with-expecter
-type ConfigerService interface {
-	GetAddressServerURL() string
-	GetSecretKey() string
-}
-
 func New(ctx context.Context, db Storeger, conf ConfigerService, ChsURLForDel chan []models.StructDelURLs) *NodeService {
 	Node := &NodeService{
 		db:           db,
@@ -57,32 +36,8 @@ type NodeService struct {
 	ChsURLForDel chan []models.StructDelURLs
 }
 
-func (r *NodeService) GetURL(ctx context.Context, id string) (string, bool, error) {
-	return r.db.GetURL(ctx, id)
-}
-
 func (r *NodeService) addURL(ctx context.Context, link string) (string, error) {
 	return r.db.AddURL(ctx, link)
-}
-
-func (r *NodeService) GetSmallLink(ctx context.Context, longLink string) (string, error) {
-
-	longLink, err := r.getFormatLongLink(longLink)
-	if err != nil {
-		return "", err
-	}
-	id, ok, err := r.db.FindLongURL(ctx, longLink)
-	if err != nil {
-		return "", err
-	}
-	if ok {
-		return r.conf.GetAddressServerURL() + id, errorsapp.ErrLinkAlreadyExists
-	}
-	id, err = r.addURL(ctx, longLink)
-	if err != nil {
-		return "", err
-	}
-	return r.conf.GetAddressServerURL() + id, nil
 }
 
 func (r *NodeService) getFormatLongLink(longLink string) (string, error) {
@@ -140,4 +95,15 @@ func getDataForToken(secretKey string) (string, string, error) {
 	}
 
 	return DataString, Token, nil
+}
+
+func (r *NodeService) AddBatchLink(ctx context.Context, batchLink []string) (map[string]string, error) {
+
+	for _, data := range batchLink {
+		if !r.URLFilter.MatchString(data) {
+			return nil, errorsapp.ErrInvalidLinkReceived
+		}
+	}
+
+	return r.db.AddBatchLink(ctx, batchLink)
 }

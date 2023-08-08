@@ -5,19 +5,22 @@ import (
 	"github.com/GZ91/linkreduct/internal/errorsapp"
 )
 
-func (r *NodeService) AddBatchLink(ctx context.Context, batchLink []string) (releasedBatchURL map[string]string, errs error) {
+func (r *NodeService) GetSmallLink(ctx context.Context, longLink string) (string, error) {
 
-	for _, data := range batchLink {
-		link := data.OriginalURL
-
-		if !r.URLFilter.MatchString(link) {
-			return nil, errorsapp.ErrInvalidLinkReceived
-		}
+	longLink, err := r.getFormatLongLink(longLink)
+	if err != nil {
+		return "", err
 	}
-
-	releasedBatchURL, errs = r.db.AddBatchLink(ctx, batchLink)
-	for index, val := range releasedBatchURL {
-		releasedBatchURL[index].ShortURL = r.conf.GetAddressServerURL() + val.ShortURL
+	id, ok, err := r.db.FindLongURL(ctx, longLink)
+	if err != nil {
+		return "", err
 	}
-	return
+	if ok {
+		return r.conf.GetAddressServerURL() + id, errorsapp.ErrLinkAlreadyExists
+	}
+	id, err = r.addURL(ctx, longLink)
+	if err != nil {
+		return "", err
+	}
+	return r.conf.GetAddressServerURL() + id, nil
 }

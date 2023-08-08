@@ -12,7 +12,7 @@ func Configuration() (*config.Config, error) {
 		return nil, err
 	}
 	logger.Initializing(envs.LvlLogs)
-	conf := config.New(false, envs.AddressServer, envs.AddressServerForURL, 10, 5, envs.SecretKey)
+	conf := config.New(false, envs.AddressServer, envs.AddressServerForURL, 100, 4, envs.SecretKey)
 	conf.ConfigureDBPostgresql(envs.GetAddressDSN())
 	return conf, nil
 }

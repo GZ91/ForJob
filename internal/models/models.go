@@ -11,21 +11,16 @@ type StructURL struct {
 }
 
 type RequestData struct {
-	URL string `json:"url"`
+	URL string `json:"longLink"`
+}
+
+type ReturnData struct {
+	LongLink  string `json:"longLink"`
+	ShortLink string `json:"shortLink"`
 }
 
 type ResultReturn struct {
 	Result string `json:"result"`
-}
-
-type IncomingBatchURL struct {
-	CorrelationID string `json:"correlation_id"`
-	OriginalURL   string `json:"original_url"`
-}
-
-type ReleasedBatchURL struct {
-	CorrelationID string `json:"correlation_id"`
-	ShortURL      string `json:"short_url"`
 }
 
 type ReturnedStructURL struct {
