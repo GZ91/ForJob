@@ -1,6 +1,8 @@
 package logger
 
-import "go.uber.org/zap"
+import (
+	"go.uber.org/zap"
+)
 
 var Log *zap.Logger
 
@@ -13,7 +15,6 @@ func Initializing(level string) error {
 	cfg := zap.NewProductionConfig()
 
 	cfg.Level = lvl
-
 	zl, err := cfg.Build()
 	if err != nil {
 		return err
@@ -21,4 +22,9 @@ func Initializing(level string) error {
 
 	Log = zl
 	return nil
+}
+
+func Mserror(msg string, err error, fields []zap.Field) []zap.Field {
+	fields = append(fields, zap.Error(err))
+	Log.Error(msg, fields...)
 }

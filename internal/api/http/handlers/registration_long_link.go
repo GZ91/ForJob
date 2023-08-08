@@ -12,21 +12,26 @@ import (
 )
 
 func (h *handlers) AddLongLinkJSON(w http.ResponseWriter, r *http.Request) {
-
+	var token string
+	var tokenIDCTX models.CtxString = "token"
+	TokenIDVal := r.Context().Value(tokenIDCTX)
+	if TokenIDVal != nil {
+		token = TokenIDVal.(string)
+	}
 	textBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		logger.Log.Error("error read body", zap.Error(err))
+		logger.Log.Error("error read body", zap.Error(err), zap.String("token", token))
 		w.Write([]byte(err.Error()))
 		return
 	}
-
+	mainLog := []zap.Field{zap.String("token", token), zap.ByteString("body", textBody), zap.String("URL", r.URL.String()), zap.String("Method", r.Method)}
 	var data models.RequestData
 
 	err = json.Unmarshal(textBody, &data)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		logger.Log.Error("error in unmarshal", zap.Error(err))
+		logger.Mserror("error in unmarshal", err, mainLog)
 		w.Write([]byte(err.Error()))
 		return
 	}
@@ -35,7 +40,7 @@ func (h *handlers) AddLongLinkJSON(w http.ResponseWriter, r *http.Request) {
 
 	if !h.URLFilter.MatchString(link) {
 		w.WriteHeader(http.StatusBadRequest)
-		logger.Log.Error("string is not a reference")
+		logger.Mserror("string is not a reference", nil, mainLog)
 		return
 	}
 
@@ -46,7 +51,7 @@ func (h *handlers) AddLongLinkJSON(w http.ResponseWriter, r *http.Request) {
 			Data, err := json.Marshal(StrData)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				logger.Log.Error("error in marshal", zap.Error(err))
+				logger.Mserror("error in marshal", err, mainLog)
 				w.Write([]byte(err.Error()))
 				return
 			}
@@ -57,7 +62,7 @@ func (h *handlers) AddLongLinkJSON(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(err.Error()))
-			logger.Log.Error("error in work DB", zap.Error(err))
+			logger.Mserror("error in work DB", err, mainLog)
 			return
 		}
 	}
@@ -74,18 +79,18 @@ func (h *handlers) AddLongLinkJSON(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
-		logger.Log.Error("error marshal", zap.Error(err))
+		logger.Mserror("error marshal", err, mainLog)
 		return
 	}
 	if len(res) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
-		logger.Log.Error("non record", zap.Error(err))
+		logger.Mserror("non record", err, mainLog)
 		return
 	}
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(res)
 	if err != nil {
-		logger.Log.Error("response recording error", zap.Error(err))
+		logger.Mserror("response recording error", err, mainLog)
 	}
 }
