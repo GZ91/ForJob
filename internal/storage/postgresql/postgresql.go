@@ -209,7 +209,7 @@ func (d *DB) AddBatchLink(ctx context.Context, batchLinks []string) (releasedBat
 	index := 0
 	for _, incomingLink := range batchLinks {
 		shorturl := ""
-		row := reqLongLinkInBase.QueryRowContext(ctx, incomingLink.OriginalURL)
+		row := reqLongLinkInBase.QueryRowContext(ctx, incomingLink)
 		err := row.Scan(&shorturl)
 		if err != nil {
 			if !errors.Is(err, sql.ErrNoRows) {
@@ -218,10 +218,6 @@ func (d *DB) AddBatchLink(ctx context.Context, batchLinks []string) (releasedBat
 			}
 		}
 		if shorturl != "" {
-			releasedBatchURL = append(releasedBatchURL, models.ReleasedBatchURL{
-				CorrelationID: incomingLink.CorrelationID,
-				ShortURL:      shorturl,
-			})
 			errs = errorsapp.ErrLinkAlreadyExists
 			continue
 		}
@@ -244,16 +240,13 @@ func (d *DB) AddBatchLink(ctx context.Context, batchLinks []string) (releasedBat
 			}
 		}
 
-		_, err = execInsertLongURLInBase.ExecContext(ctx, uuid.New().String(), shorturl, incomingLink.OriginalURL, UserID)
+		_, err = execInsertLongURLInBase.ExecContext(ctx, uuid.New().String(), shorturl, incomingLink, UserID)
 		if err != nil {
 			logger.Log.Error("When creating a string with a long link in the database", zap.Error(err))
 			tx.Rollback()
 			return nil, err
 		}
-		releasedBatchURL = append(releasedBatchURL, models.ReleasedBatchURL{
-			CorrelationID: incomingLink.CorrelationID,
-			ShortURL:      shorturl,
-		})
+
 	}
 	err = tx.Commit()
 	if err != nil {
