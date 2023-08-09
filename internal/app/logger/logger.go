@@ -24,7 +24,7 @@ func Initializing(level string) error {
 	return nil
 }
 
-func Mserror(msg string, err error, fields []zap.Field) []zap.Field {
+func Mserror(msg string, err error, fields []zap.Field) {
 	fields = append(fields, zap.Error(err))
 	Log.Error(msg, fields...)
 }

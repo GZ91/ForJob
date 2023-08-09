@@ -47,12 +47,15 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 	router.Use(NodeUse.Compress)
 	router.Use(NodeUse.CalculateSize)
 
-	router.Get("/ping", handls.PingDataBase)
-	router.Get("/{id}", handls.GetLongURL)
+	//
 	//router.Get("/api/token/urls", handls.GetURLsToken)
-	router.Post("/api/shorten/batch", handls.AddBatchLinks)
-	router.Post("/shortlink", handls.AddLongLinkJSON)
-	router.Delete("/api/user/urls", handls.DeleteURLs)
+	//	router.Post("/api/shorten/batch", handls.AddBatchLinks)
+
+	//	router.Delete("/api/user/urls", handls.DeleteURLs)
+
+	router.Get("/{id}", handls.GetLongURL)
+	router.Get("/ping", handls.PingDataBase)
+	router.Post("/token", handls.AddLongLinkJSON)
 
 	Server := http.Server{}
 	Server.Addr = conf.GetAddressServer()

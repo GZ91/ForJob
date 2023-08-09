@@ -21,15 +21,6 @@ func New(nodeService handlerserService) *handlers {
 	return &handlers{nodeService: nodeService, URLFilter: regexp.MustCompile(`^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?(\w+\.[^:\/\n]+)`)}
 }
 
-func (h *handlers) PingDataBase(w http.ResponseWriter, r *http.Request) {
-	err := h.nodeService.Ping(r.Context())
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-}
-
 func (h *handlers) GetURLsToken(w http.ResponseWriter, r *http.Request) {
 	var token string
 	var tokenIDCTX models.CtxString = "token"

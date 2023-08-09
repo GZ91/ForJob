@@ -17,7 +17,12 @@ type ctxString string
 
 func Authentication(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userID := ""
+		if r.URL.String() == "/ping" || r.URL.String() == "/" {
+			h.ServeHTTP(w, r)
+			return
+		}
+
+		Token := ""
 		cookie, err := r.Cookie("Authorization")
 		if err != nil && err != http.ErrNoCookie {
 			logger.Log.Error("authorization", zap.Error(err))
@@ -28,7 +33,7 @@ func Authentication(h http.Handler) http.Handler {
 			cook := &http.Cookie{}
 			cook.Name = "Authorization"
 			var value string
-			value, userID, err = getAuthorizationForCookie()
+			value, Token, err = getAuthorizationForCookie()
 			if err != nil {
 				logger.Log.Error("authorization", zap.Error(err))
 				w.WriteHeader(http.StatusInternalServerError)
@@ -38,14 +43,14 @@ func Authentication(h http.Handler) http.Handler {
 			http.SetCookie(w, cook)
 		} else {
 			var ok bool
-			userID, ok, err = validGetAuthentication(cookie.Value)
+			Token, ok, err = validGetAuthentication(cookie.Value)
 			if err != nil {
 				logger.Log.Error("authorization", zap.Error(err))
 				h.ServeHTTP(w, r)
 				return
 			}
 			if !ok {
-				cookie.Value, userID, err = getAuthorizationForCookie()
+				cookie.Value, Token, err = getAuthorizationForCookie()
 				if err != nil {
 					logger.Log.Error("authorization", zap.Error(err))
 					h.ServeHTTP(w, r)
@@ -54,7 +59,7 @@ func Authentication(h http.Handler) http.Handler {
 			}
 		}
 		var userIDCTX models.CtxString = "userID"
-		r = r.WithContext(context.WithValue(r.Context(), userIDCTX, userID))
+		r = r.WithContext(context.WithValue(r.Context(), userIDCTX, Token))
 		h.ServeHTTP(w, r)
 	})
 }
