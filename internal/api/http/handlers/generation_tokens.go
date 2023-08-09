@@ -15,6 +15,8 @@ func (h *handlers) GetNewToken(w http.ResponseWriter, r *http.Request) {
 	}
 	if token != h.conf.GetRootToken() {
 		logger.Msinfo("not enough rights to issue the token", nil, nil)
+		w.WriteHeader(http.StatusNonAuthoritativeInfo)
+		w.Write([]byte("not enough rights to issue the token"))
 		return
 	}
 }
