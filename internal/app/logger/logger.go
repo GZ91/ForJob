@@ -28,3 +28,8 @@ func Mserror(msg string, err error, fields []zap.Field) {
 	fields = append(fields, zap.Error(err))
 	Log.Error(msg, fields...)
 }
+
+func Msinfo(msg string, err error, fields []zap.Field) {
+	fields = append(fields, zap.Error(err))
+	Log.Info(msg, fields...)
+}

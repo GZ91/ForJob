@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/GZ91/linkreduct/internal/app/config"
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/errorsapp"
 	"github.com/GZ91/linkreduct/internal/models"
@@ -14,11 +15,12 @@ import (
 
 type handlers struct {
 	nodeService handlerserService
+	conf        *config.Config
 	URLFilter   *regexp.Regexp
 }
 
-func New(nodeService handlerserService) *handlers {
-	return &handlers{nodeService: nodeService, URLFilter: regexp.MustCompile(`^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?(\w+\.[^:\/\n]+)`)}
+func New(nodeService handlerserService, conf *config.Config) *handlers {
+	return &handlers{nodeService: nodeService, URLFilter: regexp.MustCompile(`^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?(\w+\.[^:\/\n]+)`), conf: conf}
 }
 
 func (h *handlers) GetURLsToken(w http.ResponseWriter, r *http.Request) {

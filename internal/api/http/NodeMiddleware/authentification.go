@@ -22,15 +22,15 @@ func New(conf *config.Config) *NodeUse {
 func (n *NodeUse) Authentication(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if r.Method == http.MethodGet {
+		if r.URL.String() == "/ping" {
 			h.ServeHTTP(w, r)
 			return
 		}
-
+		mainLog := []zap.Field{zap.String("URL", r.URL.String()), zap.String("Method", r.Method), zap.String("remote str", r.RemoteAddr)}
 		token := ""
-		cookie, err := r.Cookie("Token")
+		cookie, err := r.Cookie("Authorization")
 		if err != nil && err != http.ErrNoCookie {
-			logger.Log.Error("authorization", zap.Error(err))
+			logger.Mserror("authorization", err, mainLog)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -40,15 +40,21 @@ func (n *NodeUse) Authentication(h http.Handler) http.Handler {
 			return
 			token, ok, err = validGetAuthentication(cookie.Value, n.confg.GetSecretKey())
 			if err != nil {
-				logger.Log.Error("authorization", zap.Error(err))
+				mainLog = append(mainLog, zap.String("secretkey", n.confg.GetSecretKey()))
+				logger.Mserror("authorization", err, mainLog)
 				return
 			}
 		}
 		if ok {
-			var tokenIDCTX models.CtxString = "token"
-			r = r.WithContext(context.WithValue(r.Context(), tokenIDCTX, token))
-			h.ServeHTTP(w, r)
+			if n.confg.GetRootToken() == token {
+				var tokenIDCTX models.CtxString = "token"
+				r = r.WithContext(context.WithValue(r.Context(), tokenIDCTX, token))
+				h.ServeHTTP(w, r)
+				return
+			}
+
 		}
+		logger.Msinfo("non authorization", nil, mainLog)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	})

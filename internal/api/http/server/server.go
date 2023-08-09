@@ -36,7 +36,7 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 	}
 
 	NodeService := service.New(ctx, NodeStorage, conf, make(chan []models.StructDelURLs))
-	handls := handlers.New(NodeService)
+	handls := handlers.New(NodeService, conf)
 
 	router := chi.NewRouter()
 
