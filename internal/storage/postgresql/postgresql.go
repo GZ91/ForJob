@@ -31,7 +31,7 @@ func New(ctx context.Context, config ConfigerStorage, generatorRunes GeneratorRu
 	if err != nil {
 		return nil, err
 	}
-	err = db.createTable(ctx)
+	err = db.createTables(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -47,22 +47,6 @@ func (d *DB) openDB() error {
 	}
 	d.db = db
 	return nil
-}
-
-func (d *DB) createTable(ctx context.Context) error {
-	con, err := d.db.Conn(ctx)
-	if err != nil {
-		return err
-	}
-	defer con.Close()
-	_, err = con.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS short_origin_reference 
-(
-	id serial PRIMARY KEY,
-	token VARCHAR(45)  NOT NULL,
-	ShortURL VARCHAR(250) NOT NULL,
-	OriginalURL TEXT
-);`)
-	return err
 }
 
 func (d *DB) Ping(ctx context.Context) error {

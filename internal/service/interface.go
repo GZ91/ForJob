@@ -12,6 +12,7 @@ type Storeger interface {
 	AddURL(context.Context, string) (string, error)
 	GetURL(context.Context, string) (string, bool, error)
 	Ping(context.Context) error
+	GetTokens(ctx context.Context, namesServices []string) (map[string]string, error)
 	AddBatchLink(context.Context, []string) (map[string]string, error)
 	FindLongURL(context.Context, string) (string, bool, error)
 	GetLinksToken(context.Context, string) ([]models.ReturnedStructURL, error)

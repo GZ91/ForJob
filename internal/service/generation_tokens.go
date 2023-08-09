@@ -4,7 +4,6 @@ import (
 	"context"
 )
 
-func (s *NodeService) GetNewTokens(ctx context.Context, NameService []string) (map[string]string, error) {
-
-	return nil, nil
+func (s *NodeService) GetNewTokens(ctx context.Context, NameServices []string) (map[string]string, error) {
+	return s.db.GetTokens(ctx, NameServices)
 }
