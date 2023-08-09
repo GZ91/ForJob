@@ -2,6 +2,10 @@ package models
 
 import "github.com/golang-jwt/jwt/v4"
 
+type ServiceStr struct {
+	Service string `json:"service"`
+}
+
 type StructURL struct {
 	ID          string `json:"uuid" db:"uuid"`
 	ShortURL    string `json:"short_url" db:"ShortURL"`

@@ -1,7 +1,10 @@
 package service
 
-import "github.com/GZ91/linkreduct/internal/app/config"
+import (
+	"context"
+)
 
-func (s *NodeService) GetNewToken(ctx config.Config, NameService string) {
+func (s *NodeService) GetNewTokens(ctx context.Context, NameService []string) (map[string]string, error) {
 
+	return nil, nil
 }
