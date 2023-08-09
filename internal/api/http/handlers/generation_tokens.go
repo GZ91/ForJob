@@ -38,7 +38,7 @@ func (h *handlers) GetNewToken(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 		return
 	}
-	var serviceSTR models.ServiceStr
+	var serviceSTR models.ServiceNamesIn
 	err = json.Unmarshal(textBody, &serviceSTR)
 	if err != nil {
 		logger.Mserror("when translating data from json format to structure", err, mainLog)
@@ -47,9 +47,23 @@ func (h *handlers) GetNewToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := h.nodeService.GetNewTokens(r.Context(), []string{serviceSTR.Service})
+	data, err := h.nodeService.GetNewTokens(r.Context(), serviceSTR.Services)
 	if len(data) == 0 {
 		logger.Mserror("token was not created, error on lower layers", nil, mainLog)
+		return
 	}
-
+	w.Header().Add(" Content-Type", "application/json")
+	dataout, err := json.Marshal(data)
+	if err != nil {
+		logger.Mserror("when converting a list of key:value pairs", err, mainLog)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	_, err = w.Write(dataout)
+	if err != nil {
+		logger.Mserror("json records in the response body", err, mainLog)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
 }

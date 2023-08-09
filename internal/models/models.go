@@ -2,8 +2,8 @@ package models
 
 import "github.com/golang-jwt/jwt/v4"
 
-type ServiceStr struct {
-	Service string `json:"service"`
+type ServiceNamesIn struct {
+	Services []string `json:"service"`
 }
 
 type StructURL struct {
