@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"github.com/GZ91/linkreduct/internal/api/http/NodeMiddleware"
+	"github.com/GZ91/linkreduct/internal/api/http/Middleware"
 	"github.com/GZ91/linkreduct/internal/api/http/handlers"
 	"github.com/GZ91/linkreduct/internal/app/config"
 	"github.com/GZ91/linkreduct/internal/app/logger"
@@ -36,11 +36,10 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 	}
 
 	NodeService := service.New(ctx, NodeStorage, conf, make(chan []models.StructDelURLs))
+	NodeUse := Middleware.New(conf, NodeService)
 	handls := handlers.New(NodeService, conf)
 
 	router := chi.NewRouter()
-
-	NodeUse := NodeMiddleware.New(conf)
 
 	router.Use(NodeUse.Authentication)
 	router.Use(NodeUse.WithLogging)
@@ -55,7 +54,7 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 
 	router.Get("/{id}", handls.GetLongURL)
 	router.Get("/ping", handls.PingDataBase)
-	router.Post("/token", handls.AddLongLinkJSON)
+	router.Post("/token", handls.GetToken)
 
 	Server := http.Server{}
 	Server.Addr = conf.GetAddressServer()

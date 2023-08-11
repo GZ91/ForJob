@@ -39,7 +39,7 @@ func createTableTokens(ctx context.Context, con *sql.Conn) error {
 (
 	id serial PRIMARY KEY,
 	token VARCHAR(45)  NOT NULL,
-	nameservice VARCHAR(1000) NOT NULL,
+	nameservice VARCHAR(1000) NOT NULL
 );`)
 	return err
 }

@@ -1,4 +1,4 @@
-package NodeMiddleware
+package Middleware
 
 import (
 	"github.com/GZ91/linkreduct/internal/app/logger"

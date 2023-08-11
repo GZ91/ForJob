@@ -1,4 +1,4 @@
-package NodeMiddleware
+package Middleware
 
 import (
 	"compress/gzip"

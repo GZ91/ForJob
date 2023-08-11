@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"context"
+	"github.com/GZ91/linkreduct/internal/errorsapp"
 	"github.com/google/uuid"
 )
 
@@ -28,10 +29,7 @@ func (db *DB) GetTokens(ctx context.Context, namesServices []string) (map[string
 			}
 			returnData[nameService] = token
 		} else {
-			row := tx.QueryRow("SELECT service, token FROM tokens WHERE nameservice = $1 LIMIT 1", nameService)
-			var service, token string
-			row.Scan(&service, &token)
-			returnData[service] = token
+			return nil, errorsapp.ErrAlredyBeenRegistered
 		}
 	}
 	tx.Commit()

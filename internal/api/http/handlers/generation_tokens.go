@@ -2,14 +2,16 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/GZ91/linkreduct/internal/app/logger"
+	"github.com/GZ91/linkreduct/internal/errorsapp"
 	"github.com/GZ91/linkreduct/internal/models"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
 )
 
-func (h *handlers) GetNewToken(w http.ResponseWriter, r *http.Request) {
+func (h *handlers) GetToken(w http.ResponseWriter, r *http.Request) {
 	var token string
 	var tokenIDCTX models.CtxString = "token"
 	TokenIDVal := r.Context().Value(tokenIDCTX)
@@ -47,7 +49,13 @@ func (h *handlers) GetNewToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := h.nodeService.GetNewTokens(r.Context(), serviceSTR.Services)
+	data, err := h.nodeService.GetTokens(r.Context(), serviceSTR.Services)
+	if err != nil {
+		if errors.Is(err, errorsapp.ErrAlredyBeenRegistered) {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	}
 	if len(data) == 0 {
 		logger.Mserror("token was not created, error on lower layers", nil, mainLog)
 		return

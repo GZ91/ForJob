@@ -1,7 +1,5 @@
 package models
 
-import "github.com/golang-jwt/jwt/v4"
-
 type ServiceNamesIn struct {
 	Services []string `json:"service"`
 }
@@ -23,10 +21,6 @@ type ReturnData struct {
 	ShortLink string `json:"shortLink"`
 }
 
-type ResultReturn struct {
-	Result string `json:"result"`
-}
-
 type ReturnedStructURL struct {
 	ShortURL    string `json:"short_url"`
 	OriginalURL string `json:"original_url"`
@@ -37,9 +31,4 @@ type CtxString string
 type StructDelURLs struct {
 	URL    string
 	UserID string
-}
-
-type Claims struct {
-	jwt.RegisteredClaims
-	Token string
 }

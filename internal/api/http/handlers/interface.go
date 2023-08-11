@@ -7,7 +7,7 @@ import (
 
 //go:generate mockery --name handlerserService --with-expecter
 type handlerserService interface {
-	GetNewTokens(ctx context.Context, NameService []string) (map[string]string, error)
+	GetTokens(ctx context.Context, NameService []string) (map[string]string, error)
 	Ping(ctx context.Context) error
 	GetURL(context.Context, string) (string, bool, error)
 
