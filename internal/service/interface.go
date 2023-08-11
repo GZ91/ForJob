@@ -18,6 +18,7 @@ type Storeger interface {
 	FindLongURL(context.Context, string) (string, bool, error)
 	GetLinksToken(context.Context, string) ([]models.ReturnedStructURL, error)
 	InitializingRemovalChannel(context.Context, chan []models.StructDelURLs) error
+	GetServices(ctx context.Context, name string) (map[string]string, error)
 }
 
 // Storeger
