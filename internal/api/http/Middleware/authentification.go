@@ -26,7 +26,13 @@ func (n *NodeUse) Authentication(h http.Handler) http.Handler {
 				h.ServeHTTP(w, r)
 				return
 			}
-			if n.CheckToken(token) {
+			okey, err := n.CheckToken(r.Context(), token)
+			if err != nil {
+				logger.Mserror("error when trying to check the presence of a token in the database", err, mainLog)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if okey {
 				if r.URL.String() != "/token" && !strings.HasPrefix(r.URL.String(), "/services") {
 					h.ServeHTTP(w, r)
 					return

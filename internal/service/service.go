@@ -5,8 +5,6 @@ import (
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/errorsapp"
 	"github.com/GZ91/linkreduct/internal/models"
-	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"regexp"
 )
@@ -77,24 +75,6 @@ func (r *NodeService) DeletedLinks(listURLs []string, userID string) {
 func (r *NodeService) Close() error {
 	close(r.ChsURLForDel)
 	return nil
-}
-
-func (r *NodeService) GetDataToken() (string, string, error) {
-	return getDataForToken(r.conf.GetSecretKey())
-}
-
-func getDataForToken(secretKey string) (string, string, error) {
-	Token := uuid.New().String()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, models.Claims{
-		Token: Token,
-	})
-
-	DataString, err := token.SignedString([]byte(secretKey))
-	if err != nil {
-		return "", "", err
-	}
-
-	return DataString, Token, nil
 }
 
 func (r *NodeService) AddBatchLink(ctx context.Context, batchLink []string) (map[string]string, error) {

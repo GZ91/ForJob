@@ -1,6 +1,9 @@
 package Middleware
 
-import "github.com/GZ91/linkreduct/internal/app/config"
+import (
+	"context"
+	"github.com/GZ91/linkreduct/internal/app/config"
+)
 
 type NodeUse struct {
 	confg *config.Config
@@ -8,7 +11,7 @@ type NodeUse struct {
 }
 
 type servces interface {
-	CheckToken(Token string) bool
+	CheckToken(ctx context.Context, Token string) (bool, error)
 }
 
 func New(conf *config.Config, servces servces) *NodeUse {
