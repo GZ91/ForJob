@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"github.com/GZ91/linkreduct/internal/api/http/NodeMiddleware"
+	"github.com/GZ91/linkreduct/internal/api/http/Middleware"
 	"github.com/GZ91/linkreduct/internal/api/http/handlers"
 	"github.com/GZ91/linkreduct/internal/app/config"
 	"github.com/GZ91/linkreduct/internal/app/logger"
@@ -36,24 +36,25 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 	}
 
 	NodeService := service.New(ctx, NodeStorage, conf, make(chan []models.StructDelURLs))
-	handls := handlers.New(NodeService)
+	NodeUse := Middleware.New(conf, NodeService)
+	handls := handlers.New(NodeService, conf)
 
 	router := chi.NewRouter()
-
-	NodeUse := NodeMiddleware.New(conf)
 
 	router.Use(NodeUse.Authentication)
 	router.Use(NodeUse.WithLogging)
 	router.Use(NodeUse.Compress)
 	router.Use(NodeUse.CalculateSize)
 
-	router.Get("/ping", handls.PingDataBase)
-	router.Get("/{id}", handls.GetLongURL)
+	//
 	//router.Get("/api/token/urls", handls.GetURLsToken)
-	router.Post("/", handls.AddLongLink)
-	router.Post("/api/shorten/batch", handls.AddBatchLinks)
-	router.Post("/api/shorten", handls.AddLongLinkJSON)
-	router.Delete("/api/user/urls", handls.DeleteURLs)
+	//	router.Post("/api/shorten/batch", handls.AddBatchLinks)
+
+	//	router.Delete("/api/user/urls", handls.DeleteURLs)
+
+	router.Get("/{id}", handls.GetLongURL)
+	router.Get("/ping", handls.PingDataBase)
+	router.Post("/token", handls.GetToken)
 
 	Server := http.Server{}
 	Server.Addr = conf.GetAddressServer()

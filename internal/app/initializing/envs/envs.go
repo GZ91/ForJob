@@ -14,6 +14,7 @@ type EnvVars struct {
 	CSDBSslmode         string `env:"DSN_Sslmode"`
 	CSDBBaseName        string `env:"DSN_BaseName"`
 	SecretKey           string `env:"Secret_Key"`
+	RootToken           string `env:"Root_Token"`
 }
 
 func ReadEnv() (*EnvVars, error) {

@@ -1,4 +1,4 @@
-package loggermiddleware
+package Middleware
 
 import (
 	"github.com/GZ91/linkreduct/internal/app/logger"
@@ -30,7 +30,7 @@ func (r *loggingResoinseWriter) WriteHeader(statusCode int) {
 	r.ResponseWriter.WriteHeader(statusCode)
 }
 
-func WithLogging(h http.Handler) http.Handler {
+func (n *NodeUse) WithLogging(h http.Handler) http.Handler {
 	logFn := func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 

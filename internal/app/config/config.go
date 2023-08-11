@@ -14,9 +14,10 @@ type Config struct {
 	configDB          *postgresqlconfig.ConfigDB
 	mutex             sync.Mutex
 	secretKey         string
+	roottoken         string
 }
 
-func New(debug bool, addressServer, addressServerURL string, maxIterRuneGen int, startLenShortLink int, SecretKey string) *Config {
+func New(debug bool, addressServer, addressServerURL string, maxIterRuneGen int, startLenShortLink int, SecretKey string, RootToken string) *Config {
 	return &Config{
 		debug:             debug,
 		addressServer:     addressServer,
@@ -24,6 +25,7 @@ func New(debug bool, addressServer, addressServerURL string, maxIterRuneGen int,
 		addressServerURL:  addressServerURL,
 		startLenShortLink: startLenShortLink,
 		secretKey:         SecretKey,
+		roottoken:         RootToken,
 	}
 }
 
@@ -67,4 +69,8 @@ func (r *Config) GetStartLenShortLink() int {
 
 func (r *Config) GetSecretKey() string {
 	return r.secretKey
+}
+
+func (r *Config) GetRootToken() string {
+	return r.roottoken
 }
