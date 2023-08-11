@@ -18,5 +18,5 @@ RUN go build -o ./GoDockerapp ./cmd/shortener/main.go
 
 EXPOSE 8080
 
-ENTRYPOINT ["./GoDockerapp"]
-#CMD ["./go-dockerapp"]
+#ENTRYPOINT ["./GoDockerapp"]
+CMD ["./GoDockerapp"]
