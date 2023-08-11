@@ -1,6 +1,7 @@
 package service
 
-func (node *NodeService) CheckToken(token string) bool {
+import "context"
 
-	return false
+func (node *NodeService) CheckToken(ctx context.Context, Token string) (bool, error) {
+	return node.db.CheckToken(ctx, Token)
 }

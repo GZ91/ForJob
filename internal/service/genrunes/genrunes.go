@@ -17,7 +17,7 @@ func New() *Genrun {
 	}
 }
 
-var exceptionList = []string{"/services", "/token"}
+var exceptionList = []string{"services", "token"}
 
 func (g Genrun) RandStringRunes(l int) string {
 lab1:
