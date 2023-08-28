@@ -12,10 +12,6 @@ import (
 func (n *NodeUse) Authentication(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if r.Method == http.MethodGet {
-			h.ServeHTTP(w, r)
-			return
-		}
 		mainLog := []zap.Field{zap.String("URL", r.URL.String()), zap.String("Method", r.Method), zap.String("remote str", r.RemoteAddr)}
 		token := r.Header.Get("Authorization")
 		ok := token != ""
