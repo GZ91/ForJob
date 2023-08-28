@@ -10,11 +10,13 @@ WORKDIR /app
 COPY . .
 RUN go mod download
 
+RUN go mod download
+
 #RUN go get -t ./...
 
-#RUN CGO_ENABLED=0 GOOS=linux go build -o ./GoDockerapp ./cmd/shortener/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o ./GoDockerapp ./cmd/shortener/main.go
 
-RUN go build -o ./GoDockerapp ./cmd/shortener/main.go
+#RUN go build -o ./GoDockerapp ./cmd/shortener/main.go
 
 EXPOSE 8080
 
