@@ -1,0 +1,40 @@
+stages:
+  - build
+  - deploy
+
+before_script:
+  - echo $TO_REGISTRY_TOKEN | docker login -u bimbom_bot gitlab.sminex.com:5050 --password-stdin
+
+building-prod:
+  stage: build
+  script:
+    - docker build -t gitlab.sminex.com:5050/web-bim/sminex-stamp-reductor .
+    - docker push gitlab.sminex.com:5050/web-bim/sminex-stamp-reductor
+  when: always
+  only:
+    - main
+    - /release-.*/
+
+building-test:
+  stage: build
+  script:
+    - docker build -t gitlab.sminex.com:5050/web-bim/sminex-stamp-reductor:tst .
+    - docker push gitlab.sminex.com:5050/web-bim/sminex-stamp-reductor
+  when: manual
+
+deploying-prod:
+  stage: deploy
+  script:
+      - chmod +x ./scripts/reductor-prod-starter.sh && ./scripts/reductor-prod-starter.sh
+  allow_failure: true
+  when: always
+  only:
+    - main
+    - /release-.*/
+
+deploying-test:
+  stage: deploy
+  script:
+    - chmod +x ./scripts/reductor-tst-starter.sh && ./scripts/reductor-tst-starter.sh
+  allow_failure: true
+  when: manual
