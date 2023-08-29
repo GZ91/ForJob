@@ -38,7 +38,7 @@ func (n *NodeUse) Authentication(h http.Handler) http.Handler {
 			}
 		}
 		logger.Msinfo("non authorization", nil, mainLog)
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusNoContent)
 		return
 	})
 }
