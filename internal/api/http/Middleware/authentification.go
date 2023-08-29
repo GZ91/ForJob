@@ -15,7 +15,7 @@ func (n *NodeUse) Authentication(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 		}
 		mainLog := []zap.Field{zap.String("URL", r.URL.String()), zap.String("Method", r.Method), zap.String("remote str", r.RemoteAddr)}
-		token := r.Header.Get("Authorization")
+		token := r.Header.Get("Token")
 		ok := token != ""
 		if ok {
 			if n.confg.GetRootToken() == token {
