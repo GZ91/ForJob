@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"github.com/GZ91/linkreduct/internal/api/http/Middleware"
 	"github.com/GZ91/linkreduct/internal/api/http/handlers"
 	"github.com/GZ91/linkreduct/internal/app/config"
@@ -59,6 +60,7 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 
 	Server := http.Server{}
 	Server.Addr = conf.GetAddressServer()
+	fmt.Println(conf.GetAddressServer())
 	Server.Handler = router
 
 	wg := sync.WaitGroup{}
