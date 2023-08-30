@@ -13,19 +13,21 @@ import (
 
 func (h *handlers) AddLongLinkJSON(w http.ResponseWriter, r *http.Request) {
 	var token string
-	var tokenIDCTX models.CtxString = "token"
+	var tokenIDCTX models.CtxString = "Authorization"
 	TokenIDVal := r.Context().Value(tokenIDCTX)
 	if TokenIDVal != nil {
 		token = TokenIDVal.(string)
 	}
+	mainLog := []zap.Field{zap.String("URL", r.URL.String()), zap.String("Method", r.Method), zap.String("remote str", r.RemoteAddr), zap.String("token", token)}
 	textBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		logger.Log.Error("error read body", zap.Error(err), zap.String("token", token))
+		logger.Mserror("error read body", err, mainLog)
 		w.Write([]byte(err.Error()))
 		return
 	}
-	mainLog := []zap.Field{zap.String("token", token), zap.ByteString("body", textBody), zap.String("URL", r.URL.String()), zap.String("Method", r.Method)}
+	mainLog = append(mainLog, zap.ByteString("body", textBody))
+
 	var data models.RequestData
 
 	err = json.Unmarshal(textBody, &data)
@@ -88,7 +90,7 @@ func (h *handlers) AddLongLinkJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	_, err = w.Write(res)
 	if err != nil {
 		logger.Mserror("response recording error", err, mainLog)

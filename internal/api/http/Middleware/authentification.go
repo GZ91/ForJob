@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/models"
+	"github.com/GZ91/linkreduct/internal/service"
 	"go.uber.org/zap"
 	"net/http"
 	"strings"
@@ -12,6 +13,10 @@ import (
 func (n *NodeUse) Authentication(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		mainLog := []zap.Field{zap.String("URL", r.URL.String()), zap.String("Method", r.Method), zap.String("remote str", r.RemoteAddr)}
+		if service.CheckURL(r.URL.String()) {
+			h.ServeHTTP(w, r)
+			return
+		}
 		token := r.Header.Get("Authorization")
 		ok := token != ""
 		if ok {

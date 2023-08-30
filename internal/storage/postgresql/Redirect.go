@@ -5,13 +5,12 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/GZ91/linkreduct/internal/app/logger"
-	"go.uber.org/zap"
 )
 
 func (d *DB) GetURL(ctx context.Context, shortURL string) (string, bool, error) {
 	con, err := d.db.Conn(ctx)
 	if err != nil {
-		logger.Log.Error("failed to connect to the database", zap.Error(err))
+		logger.Mserror("failed to connect to the database", err, nil)
 		return "", false, err
 	}
 	defer con.Close()
@@ -20,7 +19,7 @@ func (d *DB) GetURL(ctx context.Context, shortURL string) (string, bool, error) 
 	var originurl string
 	err = row.Scan(&originurl)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		logger.Log.Error("when scanning the request for the original link", zap.Error(err))
+		logger.Mserror("when scanning the request for the original link", err, nil)
 		return "", false, err
 	}
 	if originurl != "" {

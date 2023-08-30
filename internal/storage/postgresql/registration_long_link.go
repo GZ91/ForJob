@@ -6,13 +6,12 @@ import (
 	"errors"
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/models"
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
 func (d *DB) AddURL(ctx context.Context, URL string) (string, error) {
 	var token string
-	var tokenIDCTX models.CtxString = "token"
+	var tokenIDCTX models.CtxString = "Authorization"
 	UserIDVal := ctx.Value(tokenIDCTX)
 	if UserIDVal != nil {
 		token = UserIDVal.(string)
@@ -20,7 +19,7 @@ func (d *DB) AddURL(ctx context.Context, URL string) (string, error) {
 
 	con, err := d.db.Conn(ctx)
 	if err != nil {
-		logger.Log.Error("failed to connect to the database", zap.Error(err))
+		logger.Mserror("failed to connect to the database", err, nil)
 		return "", err
 	}
 	defer con.Close()
@@ -47,10 +46,11 @@ func (d *DB) AddURL(ctx context.Context, URL string) (string, error) {
 		}
 	}
 
-	_, err = con.ExecContext(ctx, "INSERT INTO short_origin_reference(token, shorturl, originalurl) VALUES ($1, $2, $3, $4);",
-		uuid.New().String(), shorturl, URL, token)
+	_, err = con.ExecContext(ctx, "INSERT INTO short_origin_reference(token, shorturl, originalurl) VALUES ($1, $2, $3);",
+		token, shorturl, URL)
 	if err != nil {
-		logger.Log.Error("error when adding a record to the database", zap.Error(err))
+		logger.Mserror("error when adding a record to the database", err, nil)
+		return "", err
 	}
 	return shorturl, nil
 }

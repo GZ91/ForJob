@@ -1,6 +1,7 @@
 package genrunes
 
 import (
+	"github.com/GZ91/linkreduct/internal/service"
 	"math/rand"
 	"time"
 )
@@ -17,8 +18,6 @@ func New() *Genrun {
 	}
 }
 
-var exceptionList = []string{"services", "token"}
-
 func (g Genrun) RandStringRunes(l int) string {
 	var shortlink string
 	for {
@@ -27,11 +26,10 @@ func (g Genrun) RandStringRunes(l int) string {
 			b[i] = g.letterRunes[g.rander.Intn(len(g.letterRunes))]
 		}
 		shortlink = string(b)
-		for _, val := range exceptionList {
-			if shortlink != val {
-				break
-			}
+		if !service.CheckURL(shortlink) {
+			continue
 		}
+		break
 	}
 	return shortlink
 }
