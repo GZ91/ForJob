@@ -13,7 +13,7 @@ import (
 
 func (h *handlers) GetToken(w http.ResponseWriter, r *http.Request) {
 	var token string
-	var tokenIDCTX models.CtxString = "token"
+	var tokenIDCTX models.CtxString = "Authorization"
 	TokenIDVal := r.Context().Value(tokenIDCTX)
 	if TokenIDVal != nil {
 		token = TokenIDVal.(string)
