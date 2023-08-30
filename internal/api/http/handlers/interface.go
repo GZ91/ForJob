@@ -11,9 +11,9 @@ type handlerserService interface {
 	Ping(ctx context.Context) error
 	GetURL(context.Context, string) (string, bool, error)
 	GetServices(ctx context.Context, name string) (map[string]string, error)
+	DeleteToken(ctx context.Context, token string) error
 
 	GetSmallLink(context.Context, string) (string, error)
 	GetURLsToken(context.Context, string) ([]models.ReturnedStructURL, error)
 	AddBatchLink(context.Context, []string) (map[string]string, error)
-	DeletedLinks([]string, string)
 }

@@ -56,6 +56,7 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 	router.Get("/ping", handls.PingDataBase)
 	router.Post("/token", handls.GetToken)
 	router.Get("/services", handls.GetServices)
+	router.Delete("/token/{token}", handls.DeleteToken)
 
 	Server := http.Server{}
 	Server.Addr = conf.GetAddressServer()

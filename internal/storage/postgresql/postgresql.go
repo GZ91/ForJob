@@ -11,7 +11,6 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
 	"sync"
-	"time"
 )
 
 type DB struct {
@@ -94,13 +93,6 @@ func (d *DB) GetLinksToken(ctx context.Context, userID string) ([]models.Returne
 	return returnData, nil
 }
 
-func (d *DB) InitializingRemovalChannel(ctx context.Context, chsURLs chan []models.StructDelURLs) error {
-	d.chsURLsForDel = chsURLs
-	go d.GroupingDataForDeleted(ctx)
-	go d.FillBufferDelete(ctx)
-	return nil
-}
-
 func (d *DB) GroupingDataForDeleted(ctx context.Context) {
 
 	var wg sync.WaitGroup
@@ -121,42 +113,6 @@ func (d *DB) GroupingDataForDeleted(ctx context.Context) {
 			}(&wg)
 		}
 	}
-}
-
-func (d *DB) FillBufferDelete(ctx context.Context) {
-	t := time.NewTicker(time.Second * 10)
-	var listForDel []models.StructDelURLs
-	for {
-		select {
-		case val := <-d.chURLsForDel:
-			listForDel = append(listForDel, val)
-		case <-t.C:
-			if len(listForDel) > 0 {
-				d.deletedURLs(listForDel)
-				listForDel = nil
-			}
-		}
-
-	}
-}
-
-func (d *DB) deletedURLs(listForDel []models.StructDelURLs) {
-	ctx := context.Background()
-	tx, err := d.db.Begin()
-	defer tx.Rollback()
-	if err != nil {
-		logger.Log.Error("error when trying to create a connection to the database", zap.Error(err))
-		return
-	}
-	pr, err := tx.PrepareContext(ctx, "UPDATE short_origin_reference SET deletedFlag = true WHERE ShortURL = $1 and userID=$2")
-	if err != nil {
-		logger.Log.Error("error when trying to create a runtime request template", zap.Error(err))
-		return
-	}
-	for _, val := range listForDel {
-		pr.Exec(val.URL, val.UserID)
-	}
-	tx.Commit()
 }
 
 func (d *DB) AddBatchLink(ctx context.Context, batchLinks []string) (releasedBatchURL map[string]string, errs error) {

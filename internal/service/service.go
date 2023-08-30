@@ -2,10 +2,8 @@ package service
 
 import (
 	"context"
-	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/errorsapp"
 	"github.com/GZ91/linkreduct/internal/models"
-	"go.uber.org/zap"
 	"regexp"
 )
 
@@ -18,11 +16,6 @@ func New(ctx context.Context, db Storeger, conf ConfigerService, ChsURLForDel ch
 		ChsURLForDel: ChsURLForDel,
 	}
 
-	err := Node.db.InitializingRemovalChannel(ctx, Node.ChsURLForDel)
-	if err != nil {
-		logger.Log.Error("error when initializing the delete link channel", zap.Error(err))
-		return nil
-	}
 	return Node
 }
 
@@ -59,17 +52,6 @@ func (r *NodeService) GetURLsToken(ctx context.Context, token string) ([]models.
 		returnedStructURL[index].ShortURL = addressServer + val.ShortURL
 	}
 	return returnedStructURL, nil
-}
-
-func (r *NodeService) DeletedLinks(listURLs []string, userID string) {
-
-	var dataForDel []models.StructDelURLs
-	for _, val := range listURLs {
-		data := models.StructDelURLs{URL: val, UserID: userID}
-		dataForDel = append(dataForDel, data)
-	}
-
-	r.ChsURLForDel <- dataForDel
 }
 
 func (r *NodeService) Close() error {

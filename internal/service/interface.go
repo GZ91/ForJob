@@ -14,10 +14,10 @@ type Storeger interface {
 	Ping(context.Context) error
 	GetTokens(ctx context.Context, namesServices []string) (map[string]string, error)
 	CheckToken(ctx context.Context, token string) (bool, error)
+	DeleteToken(ctx context.Context, token string) error
 	AddBatchLink(context.Context, []string) (map[string]string, error)
 	FindLongURL(context.Context, string) (string, bool, error)
 	GetLinksToken(context.Context, string) ([]models.ReturnedStructURL, error)
-	InitializingRemovalChannel(context.Context, chan []models.StructDelURLs) error
 	GetServices(ctx context.Context, name string) (map[string]string, error)
 }
 
