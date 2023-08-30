@@ -5,6 +5,7 @@ import (
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/models"
 	"go.uber.org/zap"
+	"io"
 	"net/http"
 )
 
@@ -23,8 +24,18 @@ func (h *handlers) GetServices(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mainLog := []zap.Field{zap.String("URL", r.URL.String()), zap.String("Method", r.Method)}
-	nameService := r.Header.Get("name")
-	services, err := h.nodeService.GetServices(r.Context(), nameService)
+	dataName, err := io.ReadAll(r.Body)
+	if err != nil {
+		logger.Msinfo("in reading the body", err, mainLog)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("body reading error"))
+	}
+	type Name struct {
+		Name string `json:"name"`
+	}
+	var name Name
+	json.Unmarshal(dataName, &name)
+	services, err := h.nodeService.GetServices(r.Context(), name.Name)
 	if err != nil {
 		logger.Mserror("when the service is retrieved from the database", err, mainLog)
 		w.WriteHeader(http.StatusInternalServerError)
