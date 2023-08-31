@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/GZ91/linkreduct/internal/app/config"
 	"github.com/GZ91/linkreduct/internal/app/logger"
-	"github.com/GZ91/linkreduct/internal/errorsapp"
 	"github.com/GZ91/linkreduct/internal/models"
 	"github.com/GZ91/linkreduct/internal/service"
 	"github.com/GZ91/linkreduct/internal/service/mocks"
@@ -17,8 +16,9 @@ import (
 	"testing"
 )
 
-func Test_handlers_GetToken(t *testing.T) {
+func Test_handlers_GetServices(t *testing.T) {
 	logger.Initializing("info")
+
 	mockStorager := &mocks.Storeger{}
 	configa := config.New(false, "", "", 100, 4, "", "existent_token")
 
@@ -28,8 +28,9 @@ func Test_handlers_GetToken(t *testing.T) {
 		conf:        configa, // замените на вашу реальную структуру конфигурации
 		nodeService: serviceNode,
 	}
+
 	r := chi.NewRouter()
-	r.HandleFunc("/token", h.GetToken)
+	r.HandleFunc("/services", h.GetServices)
 
 	type TestCase struct {
 		name         string
@@ -53,39 +54,42 @@ func Test_handlers_GetToken(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 		},
 		{
-			name:         "AlredyBeenRegistered",
+			name:         "error when accessing the get service function",
 			token:        "existent_token",
-			body:         `{"service": ["nameService"]}`,
-			expectedCode: http.StatusBadRequest,
-			funcMock: func() {
-				mockStorager.On("GetTokens", mock_test.Anything, []string{"nameService"}).Return(nil, errorsapp.ErrAlredyBeenRegistered)
-			},
-		},
-		{
-			name:         "get other error",
-			token:        "existent_token",
-			body:         `{"service": ["nameService2"]}`,
+			body:         `{"name": "nameService"}`,
 			expectedCode: http.StatusInternalServerError,
 			funcMock: func() {
-				mockStorager.On("GetTokens", mock_test.Anything, []string{"nameService2"}).Return(nil, errors.New("other"))
+				mockStorager.On("GetServices", mock_test.Anything, "nameService").Return(nil, errors.New("other"))
 			},
 		},
 		{
 			name:         "status ok",
 			token:        "existent_token",
-			body:         `{"service": ["nameService3"]}`,
+			body:         `{"name": "nameService3"}`,
 			expectedCode: http.StatusOK,
 			funcMock: func() {
 				data := make(map[string]string)
 				data["nameService"] = "qwer-tyuiop974u-h89u"
-				mockStorager.On("GetTokens", mock_test.Anything, []string{"nameService3"}).Return(data, nil)
+				mockStorager.On("GetServices", mock_test.Anything, "nameService3").Return(data, nil)
+			},
+		},
+		{
+			name:         "status ok2",
+			token:        "existent_token",
+			body:         "",
+			expectedCode: http.StatusOK,
+			funcMock: func() {
+				data := make(map[string]string)
+				data["nameService"] = "qwer-tyuiop974u-h89u"
+				mockStorager.On("GetServices", mock_test.Anything, "").Return(data, nil)
 			},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			req, err := http.NewRequest("POST", "/token", strings.NewReader(tc.body))
+
+			req, err := http.NewRequest("POST", "/services", strings.NewReader(tc.body))
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/models"
@@ -34,7 +35,15 @@ func (h *handlers) GetServices(w http.ResponseWriter, r *http.Request) {
 		Name string `json:"name"`
 	}
 	var name Name
-	json.Unmarshal(dataName, &name)
+	if !bytes.Equal(dataName, []byte("")) {
+		err = json.Unmarshal(dataName, &name)
+		if err != nil {
+			logger.Mserror("json decode error", err, mainLog)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	}
+
 	services, err := h.nodeService.GetServices(r.Context(), name.Name)
 	if err != nil {
 		logger.Mserror("when the service is retrieved from the database", err, mainLog)
@@ -45,6 +54,7 @@ func (h *handlers) GetServices(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Mserror("when encoding into json format", err, mainLog)
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	if len(data) == 0 {
 		w.WriteHeader(http.StatusNotFound)

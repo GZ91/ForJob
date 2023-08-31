@@ -39,7 +39,7 @@ func (h *handlers) GetToken(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(textBody, &serviceSTR)
 	if err != nil {
 		logger.Mserror("when translating data from json format to structure", err, mainLog)
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		return
 	}
