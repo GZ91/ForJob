@@ -8,7 +8,6 @@ import (
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/app/signalreception"
 	"github.com/GZ91/linkreduct/internal/errorsapp"
-	"github.com/GZ91/linkreduct/internal/models"
 	"github.com/GZ91/linkreduct/internal/service"
 	"github.com/GZ91/linkreduct/internal/service/genrunes"
 	"github.com/GZ91/linkreduct/internal/storage/postgresql"
@@ -35,7 +34,7 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 		return err
 	}
 
-	NodeService := service.New(ctx, NodeStorage, conf, make(chan []models.StructDelURLs))
+	NodeService := service.New(ctx, NodeStorage, conf)
 	NodeUse := Middleware.New(conf, NodeService)
 	handls := handlers.New(NodeService, conf)
 
@@ -58,7 +57,7 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 
 	router.Post("/token", handls.GetToken)
 	router.Post("/shortlink", handls.AddLongLinkJSON)
-	
+
 	router.Delete("/token/{token}", handls.DeleteToken)
 
 	Server := http.Server{}

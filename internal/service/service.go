@@ -7,24 +7,22 @@ import (
 	"regexp"
 )
 
-func New(ctx context.Context, db Storeger, conf ConfigerService, ChsURLForDel chan []models.StructDelURLs) *NodeService {
+func New(ctx context.Context, db Storeger, conf ConfigerService) *NodeService {
 	Node := &NodeService{
-		db:           db,
-		conf:         conf,
-		URLFormat:    regexp.MustCompile(`^(?:https?:\/\/)`),
-		URLFilter:    regexp.MustCompile(`^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?(\w+\.[^:\/\n]+)`),
-		ChsURLForDel: ChsURLForDel,
+		db:        db,
+		conf:      conf,
+		URLFormat: regexp.MustCompile(`^(?:https?:\/\/)`),
+		URLFilter: regexp.MustCompile(`^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?(\w+\.[^:\/\n]+)`),
 	}
 
 	return Node
 }
 
 type NodeService struct {
-	db           Storeger
-	conf         ConfigerService
-	URLFormat    *regexp.Regexp
-	URLFilter    *regexp.Regexp
-	ChsURLForDel chan []models.StructDelURLs
+	db        Storeger
+	conf      ConfigerService
+	URLFormat *regexp.Regexp
+	URLFilter *regexp.Regexp
 }
 
 func (r *NodeService) addURL(ctx context.Context, link string) (string, error) {
@@ -55,7 +53,6 @@ func (r *NodeService) GetURLsToken(ctx context.Context, token string) ([]models.
 }
 
 func (r *NodeService) Close() error {
-	close(r.ChsURLForDel)
 	return nil
 }
 

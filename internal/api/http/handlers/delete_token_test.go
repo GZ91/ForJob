@@ -3,10 +3,11 @@ package handlers
 import (
 	"context"
 	"errors"
-	"github.com/GZ91/linkreduct/internal/api/http/handlers/mocks"
 	"github.com/GZ91/linkreduct/internal/app/config"
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/models"
+	"github.com/GZ91/linkreduct/internal/service"
+	"github.com/GZ91/linkreduct/internal/service/mocks"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,10 +19,14 @@ import (
 
 func TestDeleteToken(t *testing.T) {
 	logger.Initializing("info")
-	mock := &mocks.HandlerserService{}
+	mockStorager := &mocks.Storeger{}
+
+	configa := config.New(false, "", "", 100, 4, "", "existent_token")
+	serviceNode := service.New(context.Background(), mockStorager, configa)
+
 	h := &handlers{
-		conf:        config.New(false, "", "", 100, 4, "", "existent_token"), // замените на вашу реальную структуру конфигурации
-		nodeService: mock,
+		conf:        configa,
+		nodeService: serviceNode,
 	}
 	r := chi.NewRouter()
 	r.HandleFunc("/delete/{token}", h.DeleteToken)
@@ -35,9 +40,10 @@ func TestDeleteToken(t *testing.T) {
 		{"NotFoundToken", "not_found_token", http.StatusNotFound},
 		{"OtherError", "other_token", http.StatusInternalServerError},
 	}
-	mock.On("DeleteToken", mock_test.Anything, "existent_token").Return(nil)
-	mock.On("DeleteToken", mock_test.Anything, "not_found_token").Return(errorsapp.ErrNotFoundToken)
-	mock.On("DeleteToken", mock_test.Anything, "other_token").Return(errors.New("other"))
+
+	mockStorager.On("DeleteToken", mock_test.Anything, "existent_token").Return(nil)
+	mockStorager.On("DeleteToken", mock_test.Anything, "not_found_token").Return(errorsapp.ErrNotFoundToken)
+	mockStorager.On("DeleteToken", mock_test.Anything, "other_token").Return(errors.New("other"))
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

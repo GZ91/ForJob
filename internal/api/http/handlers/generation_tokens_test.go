@@ -3,11 +3,12 @@ package handlers
 import (
 	"context"
 	"errors"
-	"github.com/GZ91/linkreduct/internal/api/http/handlers/mocks"
 	"github.com/GZ91/linkreduct/internal/app/config"
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/errorsapp"
 	"github.com/GZ91/linkreduct/internal/models"
+	"github.com/GZ91/linkreduct/internal/service"
+	"github.com/GZ91/linkreduct/internal/service/mocks"
 	"github.com/go-chi/chi/v5"
 	mock_test "github.com/stretchr/testify/mock"
 	"net/http"
@@ -18,10 +19,14 @@ import (
 
 func Test_handlers_GetToken(t *testing.T) {
 	logger.Initializing("info")
-	mock := &mocks.HandlerserService{}
+	mockStorager := &mocks.Storeger{}
+	configa := config.New(false, "", "", 100, 4, "", "existent_token")
+
+	serviceNode := service.New(context.Background(), mockStorager, configa)
+
 	h := &handlers{
-		conf:        config.New(false, "", "", 100, 4, "", "existent_token"), // замените на вашу реальную структуру конфигурации
-		nodeService: mock,
+		conf:        configa, // замените на вашу реальную структуру конфигурации
+		nodeService: serviceNode,
 	}
 	r := chi.NewRouter()
 	r.HandleFunc("/token", h.GetToken)
@@ -53,7 +58,7 @@ func Test_handlers_GetToken(t *testing.T) {
 			body:         `{"service": ["nameService"]}`,
 			expectedCode: http.StatusBadRequest,
 			funcMock: func() {
-				mock.On("GetTokens", mock_test.Anything, []string{"nameService"}).Return(nil, errorsapp.ErrAlredyBeenRegistered)
+				mockStorager.On("GetTokens", mock_test.Anything, []string{"nameService"}).Return(nil, errorsapp.ErrAlredyBeenRegistered)
 			},
 		},
 		{
@@ -62,7 +67,7 @@ func Test_handlers_GetToken(t *testing.T) {
 			body:         `{"service": ["nameService2"]}`,
 			expectedCode: http.StatusInternalServerError,
 			funcMock: func() {
-				mock.On("GetTokens", mock_test.Anything, []string{"nameService2"}).Return(nil, errors.New("other"))
+				mockStorager.On("GetTokens", mock_test.Anything, []string{"nameService2"}).Return(nil, errors.New("other"))
 			},
 		},
 		{
@@ -73,7 +78,7 @@ func Test_handlers_GetToken(t *testing.T) {
 			funcMock: func() {
 				data := make(map[string]string)
 				data["nameService"] = "qwer-tyuiop974u-h89u"
-				mock.On("GetTokens", mock_test.Anything, []string{"nameService3"}).Return(data, nil)
+				mockStorager.On("GetTokens", mock_test.Anything, []string{"nameService3"}).Return(data, nil)
 			},
 		},
 	}
