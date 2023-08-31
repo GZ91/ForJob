@@ -5,8 +5,8 @@ import (
 	"github.com/GZ91/linkreduct/internal/models"
 )
 
-//go:generate mockery --name handlerserService --with-expecter
-type handlerserService interface {
+//go:generate mockery --name HandlerserService --with-expecter
+type HandlerserService interface {
 	GetTokens(ctx context.Context, NameService []string) (map[string]string, error)
 	Ping(ctx context.Context) error
 	GetURL(context.Context, string) (string, bool, error)

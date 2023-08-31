@@ -21,7 +21,7 @@ type Storeger interface {
 	GetServices(ctx context.Context, name string) (map[string]string, error)
 }
 
-// Storeger
+// Configer
 //
 //go:generate mockery --name ConfigerService --with-expecter
 type ConfigerService interface {

@@ -14,12 +14,12 @@ import (
 )
 
 type handlers struct {
-	nodeService handlerserService
+	nodeService HandlerserService
 	conf        *config.Config
 	URLFilter   *regexp.Regexp
 }
 
-func New(nodeService handlerserService, conf *config.Config) *handlers {
+func New(nodeService HandlerserService, conf *config.Config) *handlers {
 	return &handlers{nodeService: nodeService, URLFilter: regexp.MustCompile(`^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?(\w+\.[^:\/\n]+)`), conf: conf}
 }
 
