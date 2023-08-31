@@ -18,7 +18,7 @@ func (h *handlers) GetServices(w http.ResponseWriter, r *http.Request) {
 	}
 	if token != h.conf.GetRootToken() {
 		logger.Msinfo("insufficient rights to view services", nil, nil)
-		w.WriteHeader(http.StatusNonAuthoritativeInfo)
+		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("insufficient rights to view services"))
 		return
 	}

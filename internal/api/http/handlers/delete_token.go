@@ -19,7 +19,7 @@ func (h *handlers) DeleteToken(w http.ResponseWriter, r *http.Request) {
 	}
 	if token != h.conf.GetRootToken() {
 		logger.Msinfo("insufficient rights to delete the token", nil, nil)
-		w.WriteHeader(http.StatusNonAuthoritativeInfo)
+		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("insufficient rights to delete the token"))
 		return
 	}

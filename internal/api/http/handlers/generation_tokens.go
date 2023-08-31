@@ -20,7 +20,7 @@ func (h *handlers) GetToken(w http.ResponseWriter, r *http.Request) {
 	}
 	if token != h.conf.GetRootToken() {
 		logger.Msinfo("not enough rights to issue the token", nil, nil)
-		w.WriteHeader(http.StatusNonAuthoritativeInfo)
+		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte("not enough rights to issue the token"))
 		return
 	}
@@ -34,12 +34,7 @@ func (h *handlers) GetToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mainLog := []zap.Field{zap.String("token", token), zap.ByteString("body", textBody), zap.String("URL", r.URL.String()), zap.String("Method", r.Method)}
-	if err != nil {
-		logger.Mserror("when creating a new token", err, mainLog)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
-	}
+
 	var serviceSTR models.ServiceNamesIn
 	err = json.Unmarshal(textBody, &serviceSTR)
 	if err != nil {
@@ -55,6 +50,8 @@ func (h *handlers) GetToken(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	if len(data) == 0 {
 		logger.Mserror("token was not created, error on lower layers", nil, mainLog)
