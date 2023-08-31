@@ -13,25 +13,12 @@ import (
 
 	"github.com/GZ91/linkreduct/internal/errorsapp"
 	"github.com/go-chi/chi/v5"
+	mock_test "github.com/stretchr/testify/mock"
 )
-
-// mockNodeService - мок сервиса, реализующего метод DeleteToken
-type mockNodeService struct {
-	mocks.HandlerserService
-}
-
-func (m *mockNodeService) DeleteToken(ctx context.Context, token string) error {
-	if token == "existent_token" {
-		return nil
-	} else if token == "not_found_token" {
-		return errorsapp.ErrNotFoundToken
-	}
-	return errors.New("other_error")
-}
 
 func TestDeleteToken(t *testing.T) {
 	logger.Initializing("info")
-	mock := &mockNodeService{}
+	mock := &mocks.HandlerserService{}
 	h := &handlers{
 		conf:        config.New(false, "", "", 100, 4, "", "existent_token"), // замените на вашу реальную структуру конфигурации
 		nodeService: mock,
@@ -48,9 +35,9 @@ func TestDeleteToken(t *testing.T) {
 		{"NotFoundToken", "not_found_token", http.StatusNotFound},
 		{"OtherError", "other_token", http.StatusInternalServerError},
 	}
-	mock.On("DeleteToken", "existent_token").Return(nil)
-	mock.On("DeleteToken", "not_found_token").Return(errorsapp.ErrNotFoundToken)
-	mock.On("DeleteToken", "other_token").Return(errors.New("other"))
+	mock.On("DeleteToken", mock_test.Anything, "existent_token").Return(nil)
+	mock.On("DeleteToken", mock_test.Anything, "not_found_token").Return(errorsapp.ErrNotFoundToken)
+	mock.On("DeleteToken", mock_test.Anything, "other_token").Return(errors.New("other"))
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
