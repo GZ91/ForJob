@@ -1,12 +1,10 @@
 package handlers
 
 import (
-	"bytes"
 	"encoding/json"
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/models"
 	"go.uber.org/zap"
-	"io"
 	"net/http"
 )
 
@@ -25,26 +23,10 @@ func (h *handlers) GetServices(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mainLog := []zap.Field{zap.String("URL", r.URL.String()), zap.String("Method", r.Method)}
-	dataName, err := io.ReadAll(r.Body)
-	if err != nil {
-		logger.Msinfo("in reading the body", err, mainLog)
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("body reading error"))
-	}
-	type Name struct {
-		Name string `json:"name"`
-	}
-	var name Name
-	if !bytes.Equal(dataName, []byte("")) {
-		err = json.Unmarshal(dataName, &name)
-		if err != nil {
-			logger.Mserror("json decode error", err, mainLog)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-	}
 
-	services, err := h.nodeService.GetServices(r.Context(), name.Name)
+	Name := r.URL.Query().Get("name")
+
+	services, err := h.nodeService.GetServices(r.Context(), Name)
 	if err != nil {
 		logger.Mserror("when the service is retrieved from the database", err, mainLog)
 		w.WriteHeader(http.StatusInternalServerError)

@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/GZ91/linkreduct/internal/app/config"
 	"github.com/GZ91/linkreduct/internal/app/logger"
 	"github.com/GZ91/linkreduct/internal/models"
@@ -12,7 +13,7 @@ import (
 	mock_test "github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
-	"strings"
+	"net/url"
 	"testing"
 )
 
@@ -35,7 +36,7 @@ func Test_handlers_GetServices(t *testing.T) {
 	type TestCase struct {
 		name         string
 		token        string
-		body         string
+		param        string
 		expectedCode int
 		funcMock     func()
 	}
@@ -44,19 +45,13 @@ func Test_handlers_GetServices(t *testing.T) {
 		{
 			name:         "Unauthorized",
 			token:        "other",
-			body:         "",
+			param:        "",
 			expectedCode: http.StatusUnauthorized,
-		},
-		{
-			name:         "not json",
-			token:        "existent_token",
-			body:         "other text not json",
-			expectedCode: http.StatusBadRequest,
 		},
 		{
 			name:         "error when accessing the get service function",
 			token:        "existent_token",
-			body:         `{"name": "nameService"}`,
+			param:        `nameService`,
 			expectedCode: http.StatusInternalServerError,
 			funcMock: func() {
 				mockStorager.On("GetServices", mock_test.Anything, "nameService").Return(nil, errors.New("other"))
@@ -65,7 +60,7 @@ func Test_handlers_GetServices(t *testing.T) {
 		{
 			name:         "status ok",
 			token:        "existent_token",
-			body:         `{"name": "nameService3"}`,
+			param:        `nameService3`,
 			expectedCode: http.StatusOK,
 			funcMock: func() {
 				data := make(map[string]string)
@@ -76,7 +71,7 @@ func Test_handlers_GetServices(t *testing.T) {
 		{
 			name:         "status ok2",
 			token:        "existent_token",
-			body:         "",
+			param:        "",
 			expectedCode: http.StatusOK,
 			funcMock: func() {
 				data := make(map[string]string)
@@ -89,12 +84,23 @@ func Test_handlers_GetServices(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 
-			req, err := http.NewRequest("POST", "/services", strings.NewReader(tc.body))
-			if err != nil {
-				t.Fatal(err)
-			}
 			if tc.funcMock != nil {
 				tc.funcMock()
+			}
+
+			u, err := url.Parse("/services")
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			if tc.param != "" {
+				q := u.Query()
+				q.Add("name", tc.param)
+				u.RawQuery = q.Encode()
+			}
+			req, err := http.NewRequest("POST", u.String(), nil)
+			if err != nil {
+				t.Fatal(err)
 			}
 			var tokenIDCTX models.CtxString = "Authorization"
 			req = req.WithContext(context.WithValue(req.Context(), tokenIDCTX, tc.token))
