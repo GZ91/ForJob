@@ -58,7 +58,7 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 	router.Post("/token", handls.GetToken)
 	router.Post("/shortlink", handls.AddLongLinkJSON)
 
-	router.Delete("/token/{token}", handls.DeleteToken)
+	router.Delete("/services/{token}", handls.DeleteToken)
 
 	Server := http.Server{}
 	Server.Addr = conf.GetAddressServer()
