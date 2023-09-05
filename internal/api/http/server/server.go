@@ -54,6 +54,7 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 	router.Get("/{id}", handls.GetLongURL)
 	router.Get("/ping", handls.PingDataBase)
 	router.Get("/services", handls.GetServices)
+	router.Get("/links", handls.GetLinks)
 
 	router.Post("/token", handls.GetToken)
 	router.Post("/shortlink", handls.AddLongLinkJSON)

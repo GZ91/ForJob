@@ -286,6 +286,61 @@ func (_c *Storeger_FindLongURL_Call) RunAndReturn(run func(context.Context, stri
 	return _c
 }
 
+// GetLinks provides a mock function with given fields: ctx, token
+func (_m *Storeger) GetLinks(ctx context.Context, token string) (map[string]string, error) {
+	ret := _m.Called(ctx, token)
+
+	var r0 map[string]string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (map[string]string, error)); ok {
+		return rf(ctx, token)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) map[string]string); ok {
+		r0 = rf(ctx, token)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]string)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, token)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Storeger_GetLinks_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLinks'
+type Storeger_GetLinks_Call struct {
+	*mock.Call
+}
+
+// GetLinks is a helper method to define mock.On call
+//   - ctx context.Context
+//   - token string
+func (_e *Storeger_Expecter) GetLinks(ctx interface{}, token interface{}) *Storeger_GetLinks_Call {
+	return &Storeger_GetLinks_Call{Call: _e.mock.On("GetLinks", ctx, token)}
+}
+
+func (_c *Storeger_GetLinks_Call) Run(run func(ctx context.Context, token string)) *Storeger_GetLinks_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Storeger_GetLinks_Call) Return(_a0 map[string]string, _a1 error) *Storeger_GetLinks_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Storeger_GetLinks_Call) RunAndReturn(run func(context.Context, string) (map[string]string, error)) *Storeger_GetLinks_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetLinksToken provides a mock function with given fields: _a0, _a1
 func (_m *Storeger) GetLinksToken(_a0 context.Context, _a1 string) ([]models.ReturnedStructURL, error) {
 	ret := _m.Called(_a0, _a1)

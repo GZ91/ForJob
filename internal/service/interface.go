@@ -19,6 +19,7 @@ type Storeger interface {
 	FindLongURL(context.Context, string) (string, bool, error)
 	GetLinksToken(context.Context, string) ([]models.ReturnedStructURL, error)
 	GetServices(ctx context.Context, name string) (map[string]string, error)
+	GetLinks(ctx context.Context, token string) (map[string]string, error)
 }
 
 // Configer
