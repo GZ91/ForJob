@@ -34,6 +34,8 @@ func (n *NodeUse) Authentication(h http.Handler) http.Handler {
 			}
 			if okey {
 				if r.URL.String() != "/token" && !strings.HasPrefix(r.URL.String(), "/services") {
+					var tokenIDCTX models.CtxString = "Authorization"
+					r = r.WithContext(context.WithValue(r.Context(), tokenIDCTX, token))
 					h.ServeHTTP(w, r)
 					return
 				}
