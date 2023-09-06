@@ -40,12 +40,6 @@ func (h *handlers) AddLongLinkJSON(w http.ResponseWriter, r *http.Request) {
 
 	link := data.URL
 
-	if !h.URLFilter.MatchString(link) {
-		w.WriteHeader(http.StatusBadRequest)
-		logger.Mserror("string is not a reference", nil, mainLog)
-		return
-	}
-
 	bodyText, err := h.nodeService.GetSmallLink(r.Context(), link)
 	if err != nil {
 		if errors.Is(err, errorsapp.ErrLinkAlreadyExists) {
@@ -90,7 +84,7 @@ func (h *handlers) AddLongLinkJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(res)
 	if err != nil {
 		logger.Mserror("response recording error", err, mainLog)

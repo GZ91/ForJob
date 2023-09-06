@@ -45,12 +45,6 @@ func Start(ctx context.Context, conf *config.Config) (er error) {
 	router.Use(NodeUse.Compress)
 	router.Use(NodeUse.CalculateSize)
 
-	//
-	//router.Get("/api/token/urls", handls.GetURLsToken)
-	//	router.Post("/api/shorten/batch", handls.AddBatchLinks)
-
-	//	router.Delete("/api/user/urls", handls.DeleteURLs)
-
 	router.Get("/{id}", handls.GetLongURL)
 	router.Get("/ping", handls.PingDataBase)
 	router.Get("/services", handls.GetServices)

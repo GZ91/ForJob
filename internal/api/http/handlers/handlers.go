@@ -10,17 +10,15 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"net/http"
-	"regexp"
 )
 
 type handlers struct {
 	nodeService HandlerserService
 	conf        *config.Config
-	URLFilter   *regexp.Regexp
 }
 
 func New(nodeService HandlerserService, conf *config.Config) *handlers {
-	return &handlers{nodeService: nodeService, URLFilter: regexp.MustCompile(`^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?(\w+\.[^:\/\n]+)`), conf: conf}
+	return &handlers{nodeService: nodeService, conf: conf}
 }
 
 func (h *handlers) GetURLsToken(w http.ResponseWriter, r *http.Request) {
