@@ -21,7 +21,7 @@ func (h *handlers) DeleteLinkByLongLink(w http.ResponseWriter, r *http.Request) 
 
 	mainLog := []zap.Field{zap.String("URL", r.URL.String()), zap.String("longLink", longLink), zap.String("token", token)}
 
-	err := h.nodeService.DeleteLinkByLongLink(r.Context(), longLink)
+	err := h.nodeService.DeleteLinkByLongLink(r.Context(), longLink, token)
 	if err != nil {
 		if errors.Is(err, errorsapp.ErrNotFoundLink) {
 			w.WriteHeader(http.StatusNotFound)

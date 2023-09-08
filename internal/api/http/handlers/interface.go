@@ -13,8 +13,8 @@ type HandlerserService interface {
 	GetServices(ctx context.Context, name string) (map[string]string, error)
 	DeleteToken(ctx context.Context, token string) error
 	GetLinks(ctx context.Context, token string) (map[string]string, error)
-	DeleteLinkByLongLink(ctx context.Context, longLink string) error
-	DeleteLinkByShortLink(ctx context.Context, shortLink string) error
+	DeleteLinkByLongLink(ctx context.Context, longLink string, token string) error
+	DeleteLinkByShortLink(ctx context.Context, shortLink string, token string) error
 
 	GetSmallLink(context.Context, string) (string, error)
 	GetURLsToken(context.Context, string) ([]models.ReturnedStructURL, error)

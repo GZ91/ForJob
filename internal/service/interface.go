@@ -20,8 +20,8 @@ type Storeger interface {
 	GetLinksToken(context.Context, string) ([]models.ReturnedStructURL, error)
 	GetServices(ctx context.Context, name string) (map[string]string, error)
 	GetLinks(ctx context.Context, token string) (map[string]string, error)
-	DeleteLinkByLongLink(ctx context.Context, longLink string) error
-	DeleteLinkByShortLink(ctx context.Context, shortLink string) error
+	DeleteLinkByLongLink(ctx context.Context, longLink string, token string) error
+	DeleteLinkByShortLink(ctx context.Context, shortLink string, token string) error
 }
 
 // Configer

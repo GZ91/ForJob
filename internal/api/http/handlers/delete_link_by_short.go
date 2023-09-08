@@ -21,7 +21,7 @@ func (h *handlers) DeleteLinkByShortLink(w http.ResponseWriter, r *http.Request)
 
 	mainLog := []zap.Field{zap.String("URL", r.URL.String()), zap.String("shortLink", shortLink), zap.String("token", token)}
 
-	err := h.nodeService.DeleteLinkByShortLink(r.Context(), shortLink)
+	err := h.nodeService.DeleteLinkByShortLink(r.Context(), shortLink, token)
 	if err != nil {
 		if errors.Is(err, errorsapp.ErrNotFoundLink) {
 			w.WriteHeader(http.StatusNotFound)

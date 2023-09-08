@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func (r *NodeService) DeleteLinkByShortLink(ctx context.Context, shortLink string) error {
+func (r *NodeService) DeleteLinkByShortLink(ctx context.Context, shortLink string, token string) error {
 	shortLink = strings.Replace(shortLink, r.conf.GetAddressServerURL(), "", -1)
-	return r.db.DeleteLinkByShortLink(ctx, shortLink)
+	return r.db.DeleteLinkByShortLink(ctx, shortLink, token)
 }
