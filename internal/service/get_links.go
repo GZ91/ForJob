@@ -5,5 +5,13 @@ import (
 )
 
 func (Node *NodeService) GetLinks(ctx context.Context, token string) (map[string]string, error) {
-	return Node.db.GetLinks(ctx, token)
+	data, err := Node.db.GetLinks(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+	returnMap := make(map[string]string)
+	for short, long := range data {
+		returnMap[Node.conf.GetAddressServerURL()+short] = long
+	}
+	return returnMap, nil
 }
