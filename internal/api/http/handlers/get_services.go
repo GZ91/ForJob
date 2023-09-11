@@ -32,15 +32,18 @@ func (h *handlers) GetServices(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	if len(services) == 0 {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
 	data, err := json.Marshal(services)
 	if err != nil {
 		logger.Mserror("when encoding into json format", err, mainLog)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if len(services) == 0 {
-		w.WriteHeader(http.StatusNoContent)
-	}
+
 	w.Header().Add("Content-Type", "application/json")
 	w.Write(data)
 }
