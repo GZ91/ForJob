@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"github.com/GZ91/linkreduct/internal/models"
 )
 
 // Storeger
@@ -15,9 +14,7 @@ type Storeger interface {
 	GetTokens(ctx context.Context, namesServices []string) (map[string]string, error)
 	CheckToken(ctx context.Context, token string) (bool, error)
 	DeleteToken(ctx context.Context, token string) error
-	AddBatchLink(context.Context, []string) (map[string]string, error)
 	FindLongURL(context.Context, string) (string, bool, error)
-	GetLinksToken(context.Context, string) ([]models.ReturnedStructURL, error)
 	GetServices(ctx context.Context, name string) (map[string]string, error)
 	GetLinks(ctx context.Context, token string) (map[string]string, error)
 	DeleteLinkByLongLink(ctx context.Context, longLink string, token string) error

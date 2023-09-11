@@ -19,8 +19,3 @@ type ReturnedStructURL struct {
 }
 
 type CtxString string
-
-type StructDelURLs struct {
-	URL    string
-	UserID string
-}

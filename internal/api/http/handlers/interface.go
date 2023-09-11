@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"github.com/GZ91/linkreduct/internal/models"
 )
 
 //go:generate mockery --name HandlerserService --with-expecter
@@ -15,8 +14,5 @@ type HandlerserService interface {
 	GetLinks(ctx context.Context, token string) (map[string]string, error)
 	DeleteLinkByLongLink(ctx context.Context, longLink string, token string) error
 	DeleteLinkByShortLink(ctx context.Context, shortLink string, token string) error
-
 	GetSmallLink(context.Context, string) (string, error)
-	GetURLsToken(context.Context, string) ([]models.ReturnedStructURL, error)
-	AddBatchLink(context.Context, []string) (map[string]string, error)
 }
