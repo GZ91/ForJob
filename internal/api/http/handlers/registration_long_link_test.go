@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/GZ91/linkreduct/internal/app/config"
 	"github.com/GZ91/linkreduct/internal/app/logger"
+	"github.com/GZ91/linkreduct/internal/models"
 	"github.com/GZ91/linkreduct/internal/service"
 	"github.com/GZ91/linkreduct/internal/service/mocks"
 	"github.com/go-chi/chi/v5"
@@ -45,20 +46,22 @@ func Test_handlers_AddLongLinkJSON(t *testing.T) {
 			longLink: "/test_long.com",
 			body:     `{ "longLink": "http://test_long.com"}`,
 			funcMock: func() {
-				mockStorager.On("FindLongURL", mock.Anything, "http://test_long.com").Return("test_short.com", false, nil)
+				mockStorager.On("FindLongURL", mock.Anything, "http://test_long.com", "token").Return("test_short.com", false, nil)
 				mockStorager.On("AddURL", mock.Anything, "http://test_long.com").Return("test_short.com", nil)
 			},
 			expectedCode: http.StatusOK,
+			token:        "token",
 		},
 		{
 			name:     "old link",
 			longLink: "/test_long.com",
 			body:     `{ "longLink": "http://test_long.com"}`,
 			funcMock: func() {
-				mockStorager.On("FindLongURL", mock.Anything, "http://test_long.com").Return("test_short.com", true, nil)
+				mockStorager.On("FindLongURL", mock.Anything, "http://test_long.com", "token").Return("test_short.com", true, nil)
 				mockStorager.On("AddURL", mock.Anything, "http://test_long.com").Return("test_short.com", nil)
 			},
 			expectedCode: http.StatusOK,
+			token:        "token",
 		},
 	}
 
@@ -72,6 +75,10 @@ func Test_handlers_AddLongLinkJSON(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+
+			var tokenIDCTX models.CtxString = "Authorization"
+			req = req.WithContext(context.WithValue(req.Context(), tokenIDCTX, tc.token))
+
 			rr := httptest.NewRecorder()
 			r.ServeHTTP(rr, req)
 			if rr.Code != tc.expectedCode {

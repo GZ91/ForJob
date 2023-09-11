@@ -14,5 +14,5 @@ type HandlerserService interface {
 	GetLinks(ctx context.Context, token string) (map[string]string, error)
 	DeleteLinkByLongLink(ctx context.Context, longLink string, token string) error
 	DeleteLinkByShortLink(ctx context.Context, shortLink string, token string) error
-	GetSmallLink(context.Context, string) (string, error)
+	GetSmallLink(context.Context, string, string) (string, error)
 }

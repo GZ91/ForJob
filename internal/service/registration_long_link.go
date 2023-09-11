@@ -5,13 +5,13 @@ import (
 	"github.com/GZ91/linkreduct/internal/errorsapp"
 )
 
-func (r *NodeService) GetSmallLink(ctx context.Context, longLink string) (string, error) {
+func (r *NodeService) GetSmallLink(ctx context.Context, longLink string, token string) (string, error) {
 
 	longLink, err := r.getFormatLongLink(longLink)
 	if err != nil {
 		return "", err
 	}
-	id, ok, err := r.db.FindLongURL(ctx, longLink)
+	id, ok, err := r.db.FindLongURL(ctx, longLink, token)
 	if err != nil {
 		return "", err
 	}

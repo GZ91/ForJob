@@ -14,7 +14,7 @@ type Storeger interface {
 	GetTokens(ctx context.Context, namesServices []string) (map[string]string, error)
 	CheckToken(ctx context.Context, token string) (bool, error)
 	DeleteToken(ctx context.Context, token string) error
-	FindLongURL(context.Context, string) (string, bool, error)
+	FindLongURL(context.Context, string, string) (string, bool, error)
 	GetServices(ctx context.Context, name string) (map[string]string, error)
 	GetLinks(ctx context.Context, token string) (map[string]string, error)
 	DeleteLinkByLongLink(ctx context.Context, longLink string, token string) error

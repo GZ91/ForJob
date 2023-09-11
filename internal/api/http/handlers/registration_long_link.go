@@ -40,7 +40,7 @@ func (h *handlers) AddLongLinkJSON(w http.ResponseWriter, r *http.Request) {
 
 	link := data.URL
 
-	bodyText, err := h.nodeService.GetSmallLink(r.Context(), link)
+	bodyText, err := h.nodeService.GetSmallLink(r.Context(), link, token)
 	if err != nil {
 		if errors.Is(err, errorsapp.ErrLinkAlreadyExists) {
 			StrData := &models.ReturnData{LongLink: link, ShortLink: bodyText}

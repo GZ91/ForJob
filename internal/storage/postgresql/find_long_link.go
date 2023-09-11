@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (d *DB) FindLongURL(ctx context.Context, OriginalURL string) (string, bool, error) {
+func (d *DB) FindLongURL(ctx context.Context, OriginalURL string, token string) (string, bool, error) {
 	con, err := d.db.Conn(ctx)
 	if err != nil {
 		logger.Log.Error("failed to connect to the database", zap.Error(err))
@@ -16,7 +16,7 @@ func (d *DB) FindLongURL(ctx context.Context, OriginalURL string) (string, bool,
 	}
 	defer con.Close()
 	row := con.QueryRowContext(ctx, `SELECT ShortURL
-	FROM short_origin_reference WHERE OriginalURL = $1 limit 1`, OriginalURL)
+	FROM short_origin_reference WHERE OriginalURL = $1 AND token = $2 limit 1`, OriginalURL, token)
 	var shortURL string
 	err = row.Scan(&shortURL)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
