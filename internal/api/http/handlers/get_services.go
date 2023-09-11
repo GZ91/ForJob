@@ -38,8 +38,8 @@ func (h *handlers) GetServices(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	if len(data) == 0 {
-		w.WriteHeader(http.StatusNotFound)
+	if len(services) == 0 {
+		w.WriteHeader(http.StatusNoContent)
 	}
 	w.Header().Add("Content-Type", "application/json")
 	w.Write(data)
