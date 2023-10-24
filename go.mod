@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 module github.com/GZ91/linkreduct
+=======
+module github.com/GZ91/EmploymentTest
+>>>>>>> master
 
 go 1.19
 
 require (
+<<<<<<< HEAD
 	github.com/caarlos0/env/v6 v6.10.1
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/google/uuid v1.3.0
@@ -52,4 +57,11 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+=======
+	github.com/go-chi/chi/v5 v5.0.10 // indirect
+	github.com/ompluscator/dynamic-struct v1.4.0 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.6.0 // indirect
+	go.uber.org/zap v1.24.0 // indirect
+>>>>>>> master
 )
